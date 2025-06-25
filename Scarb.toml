@@ -1,0 +1,30 @@
+[package]
+name = "permit2"
+version = "0.1.0"
+edition = "2024_07"
+
+# See more keys and their definitions at https://docs.swmansion.com/scarb/docs/reference/manifest.html
+
+[dependencies]
+starknet = "2.11.4"
+openzeppelin_utils = "1.0.0"
+openzeppelin_token = "1.0.0"
+openzeppelin_account = "1.0.0"
+openzeppelin_introspection = "1.0.0"
+openzeppelin_access = "1.0.0"
+
+[dev-dependencies]
+snforge_std = "0.41.0"
+assert_macros = "2.11.4"
+
+[[target.starknet-contract]]
+sierra = true
+
+[scripts]
+test = "snforge test"
+
+[tool.scarb]
+allow-prebuilt-plugins = ["snforge_std"]
+
+[lib]
+name = "permit2"
