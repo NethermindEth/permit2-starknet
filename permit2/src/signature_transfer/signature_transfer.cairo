@@ -1,7 +1,7 @@
 #[starknet::component]
 pub mod SignatureTransferComponent {
+    use openzeppelin_account::interface::{ISRC6Dispatcher, ISRC6DispatcherTrait};
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
-    use permit2::libraries::mocks::ISRC6::{ISRC6PartialDispatcher, ISRC6PartialDispatcherTrait};
     use permit2::signature_transfer::interface::{
         ISignatureTransfer, PermitBatchTransferFrom, PermitTransferFrom, SignatureTransferDetails,
     };
@@ -46,19 +46,19 @@ pub mod SignatureTransferComponent {
             //    let src5_id =
             //        1270010605630597976495846281167968799381097569185364931397797212080166453709;
 
-
             false
         }
 
-        fn _validate_signature(ref self: TContractState, account: ContractAddress, hash: felt252, signature: Array<felt252>) {
-             if (ISRC6PartialDispatcher { contract_address:account }
-                .is_valid_signature(hash, signature) == 0) {
-                panic!("Invalid signature");
-            }
-
-
-
-      }
+        fn _validate_signature(
+            ref self: TContractState,
+            signer: ContractAddress,
+            hash: felt252,
+            signature: Array<felt252>,
+        ) {
+            let dispatcher = ISRC6Dispatcher { contract_address: signer };
+            let result = dispatcher.is_valid_signature(hash, signature);
+            assert(result == 'VALID' || result == 1, 'Invalid signature');
+        }
 
 
         fn _permit_transfer_from(
@@ -80,8 +80,7 @@ pub mod SignatureTransferComponent {
 
             self._use_unordered_nonce(owner, permit.nonce);
 
-        self._validate_signature(owner, data_hash, signature);
-
+            self._validate_signature(owner, data_hash, signature);
 
             IERC20Dispatcher { contract_address: permit.permitted.token }
                 .transfer_from(owner, transfer_details.to, requested_amount);

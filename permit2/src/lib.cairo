@@ -13,7 +13,6 @@ pub mod signature_transfer {
 
 pub mod libraries {
     pub mod mocks {
-        pub mod ISRC6;
         pub mod erc20;
     }
 }
