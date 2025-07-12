@@ -24,6 +24,21 @@ pub mod Permit2Lib {
         contract_address: 0xbeef.try_into().unwrap(),
     };
 
+    /// NOTE: Can remove storage and constructor once permit2 address is fixed
+    #[storage]
+    struct Storage {
+        permit2: ContractAddress,
+        #[substorage(v0)]
+        permit2_lib: Permit2Lib::Storage,
+    }
+
+
+    #[constructor]
+    fn constructor(ref self: ContractState, permit2: ContractAddress) {
+        self.permit2.write(permit2);
+    }
+
+
     #[generate_trait]
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,

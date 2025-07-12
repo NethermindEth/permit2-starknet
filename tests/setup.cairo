@@ -32,6 +32,17 @@ pub struct SetupST {
     pub permit2: ISignatureTransferDispatcher,
 }
 
+#[derive(Drop, Copy)]
+pub struct SetupPermit2Lib {
+    pub from: Account,
+    pub to: Account,
+    pub owner: ContractAddress,
+    pub bystander: ContractAddress,
+    pub erc20permit: IERC20Dispatcher,
+    pub erc20: IERC20Dispatcher,
+    pub permit2: IAllowanceTransferDispatcher,
+}
+
 
 pub fn deploy_permit2() -> ContractAddress {
     let permit2_contract = declare("Permit2").unwrap().contract_class();
@@ -41,6 +52,29 @@ pub fn deploy_permit2() -> ContractAddress {
 
     permit2_address
 }
+
+pub fn setup_permit2_lib() -> SetupPermit2Lib {
+    // Deploy permit2
+    let permit2_address = deploy_permit2();
+    let permit2 = ISignatureTransferDispatcher { contract_address: permit2_address };
+
+    // Create accounts
+    let (from, to, owner, bystander) = create_accounts();
+
+    // Deploy 2 erc20 tokens
+    let (token0, token1) = deploy_erc20_tokens(bystander, owner);
+
+    // The bystander tops up the from account with tokens
+    topup_account(token0, bystander, from.account.contract_address, 100 * E18);
+    topup_account(token1, bystander, from.account.contract_address, 100 * E18);
+
+    // The from address approves permit2 to transfer MAX tokens
+    approve_max(token0, from.account.contract_address, permit2_address);
+    approve_max(token1, from.account.contract_address, permit2_address);
+
+    SetupST { from, to, owner, bystander, token0, token1, permit2 }
+}
+
 
 pub fn deploy_erc20_tokens(
     recipient: ContractAddress, owner: ContractAddress,
