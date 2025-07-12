@@ -1,6 +1,7 @@
 pub mod libraries {
     pub mod allowance;
     pub mod bitmap;
+    pub mod permit2_lib;
     pub mod utils;
 }
 pub mod mocks {
