@@ -9,7 +9,7 @@ pub mod AllowanceTransferComponent {
         TokenSpenderPair,
     };
     use permit2::libraries::allowance::{Allowance, AllowanceTrait};
-    use permit2::libraries::permit_hash::{
+    use permit2::snip12_utils::permits::{
         PermitBatchStructHash, PermitDetailsStructHash, PermitSingleStructHash,
     };
     use starknet::storage::{

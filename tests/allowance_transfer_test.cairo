@@ -9,10 +9,10 @@ use permit2::interfaces::allowance_transfer::{
     AllowanceTransferDetails, IAllowanceTransferDispatcherTrait, PermitBatch, PermitDetails,
     PermitSingle, TokenSpenderPair,
 };
-use permit2::libraries::permit_hash::{
+use permit2::permit2::Permit2::SNIP12MetadataImpl;
+use permit2::snip12_utils::permits::{
     PermitBatchStructHash, PermitDetailsStructHash, PermitSingleStructHash,
 };
-use permit2::permit2::Permit2::SNIP12MetadataImpl;
 use snforge_std::signature::SignerTrait;
 use snforge_std::signature::stark_curve::{
     StarkCurveKeyPairImpl, StarkCurveSignerImpl, StarkCurveVerifierImpl,

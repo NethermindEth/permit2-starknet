@@ -1,13 +1,13 @@
 use core::hash::{HashStateExTrait, HashStateTrait};
 use core::poseidon::PoseidonTrait;
 use openzeppelin_utils::cryptography::snip12::{SNIP12HashSpanImpl, StructHash};
-use permit2::libraries::permit_hash::{
-    TokenPermissionsStructHash,
-    U256StructHash // _PERMIT_BATCH_WITNESS_TRANSFER_FROM_TYPE_HASH, _PERMIT_WITNESS_TRANSFER_FROM_TYPE_HASH,
-};
 //use permit2::permit2::signature_transfer::interface::TokenPermissions;
 //use starknet::get_caller_address;
 use permit2::libraries::utils::selector;
+use permit2::snip12_utils::permits::{
+    TokenPermissionsStructHash,
+    U256StructHash // _PERMIT_BATCH_WITNESS_TRANSFER_FROM_TYPE_HASH, _PERMIT_WITNESS_TRANSFER_FROM_TYPE_HASH,
+};
 
 /// Example witness
 

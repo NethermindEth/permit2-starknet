@@ -10,7 +10,7 @@ pub mod SignatureTransferComponent {
     use permit2::interfaces::signature_transfer::{
         ISignatureTransfer, PermitBatchTransferFrom, PermitTransferFrom, SignatureTransferDetails,
     };
-    use permit2::libraries::permit_hash::{
+    use permit2::snip12_utils::permits::{
         OffchainMessageHashWitnessTrait, PermitBatchStructHash, PermitBatchTransferFromStructHash,
         PermitBatchTransferFromStructHashWitness, PermitSingleStructHash,
         PermitTransferFromStructHash, PermitTransferFromStructHashWitness,

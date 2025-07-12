@@ -2,14 +2,14 @@ use permit2::interfaces::allowance_transfer::{PermitBatch, PermitDetails, Permit
 use permit2::interfaces::signature_transfer::{
     PermitBatchTransferFrom, PermitTransferFrom, TokenPermissions,
 };
-use permit2::libraries::permit_hash::{
+use permit2::mocks::mock_witness::{Beta, MockWitness, MockWitnessStructHash, Zeta};
+use permit2::permit2::Permit2::SNIP12MetadataImpl;
+use permit2::snip12_utils::permits::{
     PermitBatchStructHash, PermitBatchTransferFromStructHash,
     PermitBatchTransferFromStructHashWitness, PermitDetailsStructHash, PermitSingleStructHash,
     PermitTransferFromStructHash, PermitTransferFromStructHashWitness, TokenPermissionsStructHash,
     U256StructHash,
 };
-use permit2::mocks::mock_witness::{Beta, MockWitness, MockWitnessStructHash, Zeta};
-use permit2::permit2::Permit2::SNIP12MetadataImpl;
 use starknet::ContractAddress;
 
 

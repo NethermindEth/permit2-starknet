@@ -1,7 +1,6 @@
 pub mod libraries {
     pub mod allowance;
     pub mod bitmap;
-    pub mod permit_hash;
     pub mod utils;
 }
 pub mod mocks {
@@ -19,6 +18,9 @@ pub mod components {
 
 pub mod interface;
 pub mod permit2;
+pub mod snip12_utils {
+    pub mod permits;
+}
 
 pub mod interfaces {
     pub mod allowance_transfer;

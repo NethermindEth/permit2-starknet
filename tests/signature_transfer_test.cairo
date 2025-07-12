@@ -6,16 +6,16 @@ use permit2::interfaces::signature_transfer::{
     SignatureTransferDetails, TokenPermissions,
 };
 use permit2::libraries::bitmap::BitmapPackingTrait;
-use permit2::libraries::permit_hash::{
-    OffchainMessageHashWitnessTrait, PermitBatchStructHash, PermitBatchTransferFromStructHash,
-    PermitBatchTransferFromStructHashWitness, PermitSingleStructHash, PermitTransferFromStructHash,
-    PermitTransferFromStructHashWitness, TokenPermissionsStructHash,
-};
 use permit2::mocks::mock_erc20::{IMintableDispatcher, IMintableDispatcherTrait};
 use permit2::mocks::mock_witness::{
     Beta, MockWitness, Zeta, _MOCK_WITNESS_TYPE_STRING, _WITNESS_TYPE_STRING_FULL,
 };
 use permit2::permit2::Permit2::SNIP12MetadataImpl;
+use permit2::snip12_utils::permits::{
+    OffchainMessageHashWitnessTrait, PermitBatchStructHash, PermitBatchTransferFromStructHash,
+    PermitBatchTransferFromStructHashWitness, PermitSingleStructHash, PermitTransferFromStructHash,
+    PermitTransferFromStructHashWitness, TokenPermissionsStructHash,
+};
 use snforge_std::signature::SignerTrait;
 use snforge_std::signature::stark_curve::StarkCurveSignerImpl;
 use snforge_std::{
