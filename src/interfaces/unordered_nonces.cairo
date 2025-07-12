@@ -4,15 +4,19 @@ use starknet::ContractAddress;
 pub trait IUnorderedNonces<TState> {
     /// Read ///
 
-    /// @notice A map from token owner address and a caller specified nonce_space to a bitmap. Used
+    /// A map from token owner address and a caller specified nonce_space to a bitmap. Used
     /// to set bits in the bitmap to prevent against signature replay protection
-    /// @dev Uses unordered nonces so that permit messages do not need to be spent in a certain
-    /// order
-    /// @dev The mapping is indexed first by the token owner, then by a nonce_space specified in
-    /// the nonce
-    /// @dev It returns a felt252 bitmap
-    /// @dev The nonce_space, or wordPosition is capped at
-    /// type(uint244).max
+    ///
+    /// Uses unordered nonces so that permit messages do not need to be spent in a certain order
+    ///
+    /// The nonce_space, or wordPosition is capped at type(uint244).max
+    ///
+    /// Parameters:
+    ///
+    /// - 'owner': The address of the token owner.
+    /// - 'nonce_space': The nonce space to query the bitmap for.
+    ///
+    /// Returns a felt252 bitmap representing the nonces in the given nonce space for the owner.
     fn nonce_bitmap(self: @TState, owner: ContractAddress, nonce_space: felt252) -> felt252;
 
     /// Determines if nonce is usable.

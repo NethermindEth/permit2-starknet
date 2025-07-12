@@ -63,21 +63,18 @@ pub mod UnorderedNoncesComponent {
     };
 
     /// ERRORS ///
-
     pub mod Error {
         pub const NONCE_ALREADY_INVALIDATED: felt252 = 'Nonce already invalidated';
     }
 
 
     /// STORAGE ///
-
     #[storage]
     pub struct Storage {
         nonces_bitmap: Map<(ContractAddress, felt252), felt252>,
     }
 
     /// EVENTS ///
-
     #[event]
     #[derive(Drop, starknet::Event)]
     pub enum Event {

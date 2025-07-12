@@ -6,26 +6,33 @@ pub mod AllowanceTransferComponent {
     use openzeppelin_utils::cryptography::snip12::{OffchainMessageHash, SNIP12Metadata};
     use permit2::interfaces::allowance_transfer::{
         AllowanceTransferDetails, IAllowanceTransfer, PermitBatch, PermitDetails, PermitSingle,
-        TokenSpenderPair, errors,
+        TokenSpenderPair,
     };
     use permit2::libraries::allowance::{Allowance, AllowanceTrait};
     use permit2::libraries::permit_hash::{
         PermitBatchStructHash, PermitDetailsStructHash, PermitSingleStructHash,
     };
-    use starknet::ContractAddress;
     use starknet::storage::{
         Map, StoragePathEntry, StoragePointerReadAccess, StoragePointerWriteAccess,
     };
+    use starknet::{ContractAddress, VALIDATED, get_block_timestamp, get_caller_address};
+
+    /// ERRORS ///
+    pub mod Errors {
+        pub const SignatureExpired: felt252 = 'AT: signature expired';
+        pub const AllowanceExpired: felt252 = 'AT: allowance expired';
+        pub const InvalidNonce: felt252 = 'AT: invalid nonce';
+        pub const InvalidSignature: felt252 = 'AT: invalid signature';
+        pub const ExcessiveNonceDelta: felt252 = 'AT: excessive nonce delta';
+    }
 
     /// STORAGE ///
-
     #[storage]
     pub struct Storage {
         allowance: Map<(ContractAddress, ContractAddress, ContractAddress), Allowance>,
     }
 
     /// EVENTS ///
-
     #[event]
     #[derive(Drop, starknet::Event)]
     pub enum Event {
@@ -35,7 +42,7 @@ pub mod AllowanceTransferComponent {
         Lockdown: Lockdown,
     }
 
-    /// @notice Emits an event when the owner successfully invalidates an ordered nonce.
+    /// Emited when the owner successfully invalidates an ordered nonce.
     #[derive(Drop, starknet::Event)]
     pub struct NonceInvalidation {
         #[key]
@@ -44,14 +51,12 @@ pub mod AllowanceTransferComponent {
         pub token: ContractAddress,
         #[key]
         pub spender: ContractAddress,
-        /// NOTE: in solidity uint48
         pub new_nonce: u64,
         pub old_nonce: u64,
     }
 
 
-    /// @notice Emits an event when the owner successfully sets permissions on a token for the
-    /// spender.
+    /// Emitted when the owner successfully sets permissions on a token for the spender.
     #[derive(Drop, starknet::Event)]
     pub struct Approval {
         #[key]
@@ -60,13 +65,12 @@ pub mod AllowanceTransferComponent {
         pub token: ContractAddress,
         #[key]
         pub spender: ContractAddress,
-        /// NOTE: uint160 in sol
         pub amount: u256,
         pub expiration: u64,
     }
 
-    /// @notice Emits an event when the owner successfully sets permissions using a permit
-    /// signature on a token for the spender.
+    /// Emitted an event when the owner successfully sets permissions using a permit signature on a
+    /// token for the spender.
     #[derive(Drop, starknet::Event)]
     pub struct Permit {
         #[key]
@@ -81,8 +85,7 @@ pub mod AllowanceTransferComponent {
         pub nonce: u64,
     }
 
-    /// @notice Emits an event when the owner sets the allowance back to 0 with the lockdown
-    /// function.
+    /// Emitted an event when the owner sets the allowance back to 0 with the lockdown function.
     #[derive(starknet::Event, Drop)]
     pub struct Lockdown {
         #[key]
@@ -93,7 +96,6 @@ pub mod AllowanceTransferComponent {
 
 
     /// PUBLIC ///
-
     #[embeddable_as(AllowanceTransferImpl)]
     impl AllowanceTransfer<
         TContractState,
@@ -122,7 +124,7 @@ pub mod AllowanceTransferComponent {
             amount: u256,
             expiration: u64,
         ) {
-            let owner = starknet::get_caller_address();
+            let owner = get_caller_address();
             let mut allowance = self.allowance.entry((owner, token, spender));
             allowance.update_amount_and_expiration(amount, expiration);
             self.emit(Approval { owner: owner, token, spender, amount, expiration })
@@ -131,44 +133,44 @@ pub mod AllowanceTransferComponent {
         fn permit(
             ref self: ComponentState<TContractState>,
             owner: ContractAddress,
-            permit_single: PermitSingle,
+            permit: PermitSingle,
             signature: Array<felt252>,
         ) {
             assert(
-                starknet::get_block_timestamp() <= permit_single.sig_deadline.try_into().unwrap(),
-                errors::SignatureExpired,
+                get_block_timestamp() <= permit.sig_deadline.try_into().unwrap(),
+                Errors::SignatureExpired,
             );
 
-            let message_hash = permit_single.get_message_hash(owner);
+            let message_hash = permit.get_message_hash(owner);
             let src6_dispatcher = ISRC6Dispatcher { contract_address: owner };
             assert(
-                src6_dispatcher.is_valid_signature(message_hash, signature) == starknet::VALIDATED,
-                errors::InvalidSignature,
+                src6_dispatcher.is_valid_signature(message_hash, signature) == VALIDATED,
+                Errors::InvalidSignature,
             );
-            self._update_approval(permit_single.details, owner, permit_single.spender);
+            self._update_approval(permit.details, owner, permit.spender);
         }
 
         fn permit_batch(
             ref self: ComponentState<TContractState>,
             owner: ContractAddress,
-            permit_batch: PermitBatch,
+            permit: PermitBatch,
             signature: Array<felt252>,
         ) {
             assert(
-                starknet::get_block_timestamp() <= permit_batch.sig_deadline.try_into().unwrap(),
-                errors::SignatureExpired,
+                get_block_timestamp() <= permit.sig_deadline.try_into().unwrap(),
+                Errors::SignatureExpired,
             );
 
-            let message_hash = permit_batch.get_message_hash(owner);
+            let message_hash = permit.get_message_hash(owner);
             let src6_dispatcher = ISRC6Dispatcher { contract_address: owner };
 
             assert(
-                src6_dispatcher.is_valid_signature(message_hash, signature) == starknet::VALIDATED,
-                errors::InvalidSignature,
+                src6_dispatcher.is_valid_signature(message_hash, signature) == VALIDATED,
+                Errors::InvalidSignature,
             );
 
-            let spender = permit_batch.spender;
-            for permit_single in permit_batch.details {
+            let spender = permit.spender;
+            for permit_single in permit.details {
                 self._update_approval(*permit_single, owner, spender)
             }
         }
@@ -193,7 +195,7 @@ pub mod AllowanceTransferComponent {
         }
 
         fn lockdown(ref self: ComponentState<TContractState>, approvals: Array<TokenSpenderPair>) {
-            let owner = starknet::get_caller_address();
+            let owner = get_caller_address();
 
             for approval in approvals {
                 let allowance_storage = self
@@ -212,13 +214,13 @@ pub mod AllowanceTransferComponent {
             spender: ContractAddress,
             new_nonce: u64,
         ) {
-            let owner = starknet::get_caller_address();
+            let owner = get_caller_address();
             let allowance_storage = self.allowance.entry((owner, token, spender));
             let mut allowed = allowance_storage.read();
             let old_nonce = allowed.nonce;
-            assert(new_nonce > old_nonce, errors::InvalidNonce);
+            assert(new_nonce > old_nonce, Errors::InvalidNonce);
             /// Assert delta is less than u16 max.
-            assert(new_nonce - old_nonce < Bounded::<u16>::MAX.into(), errors::ExcessiveNonceDelta);
+            assert(new_nonce - old_nonce < Bounded::<u16>::MAX.into(), Errors::ExcessiveNonceDelta);
             allowed.nonce = new_nonce;
             allowance_storage.write(allowed);
             self.emit(NonceInvalidation { owner, token, spender, new_nonce, old_nonce });
@@ -226,7 +228,6 @@ pub mod AllowanceTransferComponent {
     }
 
     /// INTERNAL ///
-
     #[generate_trait]
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>, +SNIP12Metadata, +Drop<TContractState>,
@@ -242,7 +243,7 @@ pub mod AllowanceTransferComponent {
                 .allowance
                 .entry((from, token, starknet::get_caller_address()));
             let mut allowed = allowance_storage.read();
-            assert(starknet::get_block_timestamp() <= allowed.expiration, errors::AllowanceExpired);
+            assert(get_block_timestamp() <= allowed.expiration, Errors::AllowanceExpired);
 
             if allowed.amount != Bounded::MAX {
                 allowed.amount -= amount;
@@ -260,7 +261,7 @@ pub mod AllowanceTransferComponent {
             spender: ContractAddress,
         ) {
             let mut allowance_storage = self.allowance.entry((owner, details.token, spender));
-            assert(details.nonce == allowance_storage.read().nonce, errors::InvalidNonce);
+            assert(details.nonce == allowance_storage.read().nonce, Errors::InvalidNonce);
 
             allowance_storage.update_all(details.amount, details.expiration, details.nonce);
             self
