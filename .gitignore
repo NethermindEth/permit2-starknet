@@ -5,3 +5,7 @@ coverage/
 profile/
 */.DS_Store
 .DS_Store
+*/.env
+scripts/accounts/deployer_account*.json
+!scripts/accounts/deployer_account_katana.json
+
