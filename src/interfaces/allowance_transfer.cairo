@@ -1,8 +1,7 @@
 use starknet::ContractAddress;
-use starknet::storage_access::StorePacking;
-
 
 /// ERRORS ///
+
 pub mod errors {
     pub const SignatureExpired: felt252 = 'AT: signature expired';
     pub const AllowanceExpired: felt252 = 'AT: allowance expired';
@@ -11,132 +10,41 @@ pub mod errors {
     pub const ExcessiveNonceDelta: felt252 = 'AT: excessive nonce delta';
 }
 
-/// EVENTS ///
-pub mod events {
-    use starknet::ContractAddress;
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    pub enum AllowanceTransferEvent {
-        NonceInvalidation: NonceInvalidation,
-        Approval: Approval,
-        Permit: Permit,
-        Lockdown: Lockdown,
-    }
-
-    /// @notice Emits an event when the owner successfully invalidates an ordered nonce.
-    #[derive(Drop, starknet::Event)]
-    pub struct NonceInvalidation {
-        #[key]
-        pub owner: ContractAddress,
-        #[key]
-        pub token: ContractAddress,
-        #[key]
-        pub spender: ContractAddress,
-        /// NOTE: in solidity uint48
-        pub new_nonce: u64,
-        pub old_nonce: u64,
-    }
-
-
-    /// @notice Emits an event when the owner successfully sets permissions on a token for the
-    /// spender.
-    #[derive(Drop, starknet::Event)]
-    pub struct Approval {
-        #[key]
-        pub owner: ContractAddress,
-        #[key]
-        pub token: ContractAddress,
-        #[key]
-        pub spender: ContractAddress,
-        /// NOTE: uint160 in sol
-        pub amount: u256,
-        pub expiration: u64,
-    }
-
-    /// @notice Emits an event when the owner successfully sets permissions using a permit
-    /// signature on a token for the spender.
-    #[derive(Drop, starknet::Event)]
-    pub struct Permit {
-        #[key]
-        pub owner: ContractAddress,
-        #[key]
-        pub token: ContractAddress,
-        #[key]
-        pub spender: ContractAddress,
-        /// NOTE: uint160 in sol
-        pub amount: u256,
-        pub expiration: u64,
-        pub nonce: u64,
-    }
-
-    /// @notice Emits an event when the owner sets the allowance back to 0 with the lockdown
-    /// function.
-    #[derive(starknet::Event, Drop)]
-    pub struct Lockdown {
-        #[key]
-        pub owner: ContractAddress,
-        pub token: ContractAddress,
-        pub spender: ContractAddress,
-    }
-}
-
 /// STRUCTS ///
 
-/// @notice The permit data for a token
+/// The permit data for a token
+/// @param token The ERC20 token address
+/// @param amount The maximum amount allowed to spend
+/// @param expiration The timestamp at which a spender's token allowances become invalid
+/// @param nonce An incrementing value indexed per owner, token, and spender for each signature
 #[derive(Drop, Copy, Serde, Hash)]
 pub struct PermitDetails {
-    // ERC20 token address
     pub token: ContractAddress,
-    // the maximum amount allowed to spend
     pub amount: u256,
-    // timestamp at which a spender's token allowances become invalid
     pub expiration: u64,
-    // an incrementing value indexed per owner,token,and spender for each signature
     pub nonce: u64,
 }
 
-/// @notice The permit message signed for a single token allowance
+/// The permit message signed for a single token allowance
+/// @param details The permit data for a single token allowance
+/// @param spender The address permissioned on the allowed token
+/// @param sig_deadline The deadline on the permit signature
 #[derive(Drop, Copy, Serde, Hash)]
 pub struct PermitSingle {
-    // the permit data for a single token allowance
     pub details: PermitDetails,
-    // address permissioned on the allowed tokens
     pub spender: ContractAddress,
-    // deadline on the permit signature
     pub sig_deadline: u256,
 }
 
-/// @notice The permit message signed for multiple token allowances
+/// The permit message signed for multiple token allowances
+/// @param details The permit data for multiple token allowances
+/// @param spender The address permissioned on the allowed tokens
+/// @param sig_deadline The deadline on the permit signature
 #[derive(Drop, Copy, Serde)]
 pub struct PermitBatch {
-    // the permit data for multiple token allowances
     pub details: Span<PermitDetails>,
-    // address permissioned on the allowed tokens
     pub spender: ContractAddress,
-    // deadline on the permit signature
     pub sig_deadline: u256,
-}
-
-/// @notice The saved permissions
-/// @dev This info is saved per owner, per token, per spender and all signed over in the permit
-/// message @dev Setting amount to type(uint160).max sets an unlimited approval
-/// NOTE: in solidity this pack u160 + 2 * u48 into u256
-#[derive(Drop, Copy, Serde, PartialEq, Debug)]
-pub struct Allowance {
-    pub amount: u256,
-    pub expiration: u64,
-    pub nonce: u64,
-}
-
-impl AllowancePacking of StorePacking<Allowance, (u256, u64, u64)> {
-    fn pack(value: Allowance) -> (u256, u64, u64) {
-        (value.amount, value.expiration, value.nonce)
-    }
-
-    fn unpack(value: (u256, u64, u64)) -> Allowance {
-        let (amount, expiration, nonce) = value;
-        Allowance { amount, expiration, nonce }
-    }
 }
 
 /// @notice A token spender pair.

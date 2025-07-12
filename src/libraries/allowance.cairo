@@ -1,5 +1,5 @@
-use permit2::interfaces::allowance_transfer::Allowance;
 use starknet::storage::{Mutable, StoragePath, StoragePointerReadAccess, StoragePointerWriteAccess};
+use starknet::storage_access::StorePacking;
 
 pub trait AllowanceTrait {
     const BLOCK_TIMESTAMP_EXPIRATION: u64;
@@ -11,6 +11,29 @@ pub trait AllowanceTrait {
         ref self: StoragePath<Mutable<Allowance>>, amount: u256, expiration: u64,
     );
 }
+
+/// The saved permissions
+/// @dev This info is saved per owner, per token, per spender and all signed over in the permit
+/// message
+/// @dev Setting amount to type(uint256).max sets an unlimited approval
+#[derive(Drop, Copy, Serde, PartialEq, Debug)]
+pub struct Allowance {
+    pub amount: u256,
+    pub expiration: u64,
+    pub nonce: u64,
+}
+
+impl AllowancePacking of StorePacking<Allowance, (u256, u64, u64)> {
+    fn pack(value: Allowance) -> (u256, u64, u64) {
+        (value.amount, value.expiration, value.nonce)
+    }
+
+    fn unpack(value: (u256, u64, u64)) -> Allowance {
+        let (amount, expiration, nonce) = value;
+        Allowance { amount, expiration, nonce }
+    }
+}
+
 
 impl AllowanceImpl of AllowanceTrait {
     const BLOCK_TIMESTAMP_EXPIRATION: u64 = 0;
