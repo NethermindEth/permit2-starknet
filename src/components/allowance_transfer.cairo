@@ -5,10 +5,10 @@ pub mod AllowanceTransferComponent {
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use openzeppelin_utils::cryptography::snip12::{OffchainMessageHash, SNIP12Metadata};
     use permit2::interfaces::allowance_transfer::{
-        Allowance, AllowanceTransferDetails, IAllowanceTransfer, PermitBatch, PermitDetails,
-        PermitSingle, TokenSpenderPair, errors, events,
+        AllowanceTransferDetails, IAllowanceTransfer, PermitBatch, PermitDetails, PermitSingle,
+        TokenSpenderPair, errors,
     };
-    use permit2::libraries::allowance::AllowanceTrait;
+    use permit2::libraries::allowance::{Allowance, AllowanceTrait};
     use permit2::libraries::permit_hash::{
         PermitBatchStructHash, PermitDetailsStructHash, PermitSingleStructHash,
     };
@@ -29,9 +29,68 @@ pub mod AllowanceTransferComponent {
     #[event]
     #[derive(Drop, starknet::Event)]
     pub enum Event {
-        #[flat]
-        AllowanceTransferEvent: events::AllowanceTransferEvent,
+        NonceInvalidation: NonceInvalidation,
+        Approval: Approval,
+        Permit: Permit,
+        Lockdown: Lockdown,
     }
+
+    /// @notice Emits an event when the owner successfully invalidates an ordered nonce.
+    #[derive(Drop, starknet::Event)]
+    pub struct NonceInvalidation {
+        #[key]
+        pub owner: ContractAddress,
+        #[key]
+        pub token: ContractAddress,
+        #[key]
+        pub spender: ContractAddress,
+        /// NOTE: in solidity uint48
+        pub new_nonce: u64,
+        pub old_nonce: u64,
+    }
+
+
+    /// @notice Emits an event when the owner successfully sets permissions on a token for the
+    /// spender.
+    #[derive(Drop, starknet::Event)]
+    pub struct Approval {
+        #[key]
+        pub owner: ContractAddress,
+        #[key]
+        pub token: ContractAddress,
+        #[key]
+        pub spender: ContractAddress,
+        /// NOTE: uint160 in sol
+        pub amount: u256,
+        pub expiration: u64,
+    }
+
+    /// @notice Emits an event when the owner successfully sets permissions using a permit
+    /// signature on a token for the spender.
+    #[derive(Drop, starknet::Event)]
+    pub struct Permit {
+        #[key]
+        pub owner: ContractAddress,
+        #[key]
+        pub token: ContractAddress,
+        #[key]
+        pub spender: ContractAddress,
+        /// NOTE: uint160 in sol
+        pub amount: u256,
+        pub expiration: u64,
+        pub nonce: u64,
+    }
+
+    /// @notice Emits an event when the owner sets the allowance back to 0 with the lockdown
+    /// function.
+    #[derive(starknet::Event, Drop)]
+    pub struct Lockdown {
+        #[key]
+        pub owner: ContractAddress,
+        pub token: ContractAddress,
+        pub spender: ContractAddress,
+    }
+
 
     /// PUBLIC ///
 
@@ -66,12 +125,7 @@ pub mod AllowanceTransferComponent {
             let owner = starknet::get_caller_address();
             let mut allowance = self.allowance.entry((owner, token, spender));
             allowance.update_amount_and_expiration(amount, expiration);
-            self
-                .emit(
-                    events::AllowanceTransferEvent::Approval(
-                        events::Approval { owner: owner, token, spender, amount, expiration },
-                    ),
-                )
+            self.emit(Approval { owner: owner, token, spender, amount, expiration })
         }
 
         fn permit(
@@ -148,14 +202,7 @@ pub mod AllowanceTransferComponent {
                 let mut allowed = allowance_storage.read();
                 allowed.amount = 0;
                 allowance_storage.write(allowed);
-                self
-                    .emit(
-                        events::AllowanceTransferEvent::Lockdown(
-                            events::Lockdown {
-                                owner, token: approval.token, spender: approval.spender,
-                            },
-                        ),
-                    );
+                self.emit(Lockdown { owner, token: approval.token, spender: approval.spender });
             }
         }
 
@@ -174,12 +221,7 @@ pub mod AllowanceTransferComponent {
             assert(new_nonce - old_nonce < Bounded::<u16>::MAX.into(), errors::ExcessiveNonceDelta);
             allowed.nonce = new_nonce;
             allowance_storage.write(allowed);
-            self
-                .emit(
-                    events::AllowanceTransferEvent::NonceInvalidation(
-                        events::NonceInvalidation { owner, token, spender, new_nonce, old_nonce },
-                    ),
-                );
+            self.emit(NonceInvalidation { owner, token, spender, new_nonce, old_nonce });
         }
     }
 
@@ -223,16 +265,14 @@ pub mod AllowanceTransferComponent {
             allowance_storage.update_all(details.amount, details.expiration, details.nonce);
             self
                 .emit(
-                    events::AllowanceTransferEvent::Permit(
-                        events::Permit {
-                            owner,
-                            token: details.token,
-                            spender,
-                            amount: details.amount,
-                            expiration: details.expiration,
-                            nonce: details.nonce,
-                        },
-                    ),
+                    Permit {
+                        owner,
+                        token: details.token,
+                        spender,
+                        amount: details.amount,
+                        expiration: details.expiration,
+                        nonce: details.nonce,
+                    },
                 );
         }
     }
