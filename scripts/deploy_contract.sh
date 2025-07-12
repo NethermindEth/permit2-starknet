@@ -22,10 +22,6 @@ export STARKNET_RPC
 export STARKNET_ACCOUNT
 export STARKNET_PRIVATE_KEY
 
-echo Starknet RPC: $STARKNET_RPC
-echo Starknet Account: $STARKNET_ACCOUNT
-echo Starknet Private Key: $STARKNET_PRIVATE_KEY
-
 # Paths
 CONTRACT_NAME="Permit2"
 CONTRACT_JSON="../target/dev/permit2_${CONTRACT_NAME}.contract_class.json"
