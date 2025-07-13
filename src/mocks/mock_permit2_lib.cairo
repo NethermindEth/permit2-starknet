@@ -1,16 +1,14 @@
-#[starknet::component]
+#[starknet::contract]
 mod MockPermit2Lib {
-    use openzeppelin_account::AccountComponent;
-    use openzeppelin_introspection::src5::SRC5Component;
     use permit2::libraries::permit2_lib::Permit2Lib;
+    use starknet::ContractAddress;
 
-    component!(path: Permit2Lib, storage: account, event: Permit2LibEvent);
+    component!(path: Permit2Lib, storage: permit2_lib, event: Permit2LibEvent);
 
     impl Permit2LibImpl = Permit2Lib::InternalImpl<ContractState>;
 
     #[storage]
     struct Storage {
-        permit2: ContractAddress,
         #[substorage(v0)]
         permit2_lib: Permit2Lib::Storage,
     }
@@ -19,19 +17,17 @@ mod MockPermit2Lib {
     #[derive(Drop, starknet::Event)]
     enum Event {
         #[flat]
-        Permit2LibEvent: Permit2LibComponent::Event,
-        #[flat]
-        SRC5Event: SRC5Component::Event,
+        Permit2LibEvent: Permit2Lib::Event,
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, permit2: ContractAddress) {
-        self.permit2.write(permit2);
+    fn constructor(ref self: ContractState, permit2_address: ContractAddress) {
+        self.permit2_lib._initialize(permit2_address);
     }
 
-    fn transfer_from(
+    fn transfer_from2(
         ref self: ContractState,
-        token: ContractAddres,
+        token: ContractAddress,
         from: ContractAddress,
         to: ContractAddress,
         amount: u256,
@@ -39,14 +35,15 @@ mod MockPermit2Lib {
         self.permit2_lib._transfer_from2(token, from, to, amount);
     }
 
-    fn permit(
+    /// @dev `_` added to avoid conflict with the module named `permit2`
+    fn permit2_(
         ref self: ContractState,
         token: ContractAddress,
         owner: ContractAddress,
         spender: ContractAddress,
         amount: u256,
-        deadline: u256,
-        signature: Span<felt252>,
+        deadline: u64,
+        signature: Array<felt252>,
     ) {
         self.permit2_lib._permit2(token, owner, spender, amount, deadline, signature);
     }

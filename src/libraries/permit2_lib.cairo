@@ -1,5 +1,3 @@
-use starknet::ContractAddress;
-
 #[starknet::component]
 pub mod Permit2Lib {
     use core::num::traits::Bounded;
@@ -12,31 +10,30 @@ pub mod Permit2Lib {
         PermitSingle,
     };
     use starknet::ContractAddress;
-    use starknet::storage::{
-        Map, StoragePathEntry, StoragePointerReadAccess, StoragePointerWriteAccess,
-    };
+    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
 
-
-    /// NOTE: Can remove storage and constructor once permit2 address is fixed
+    /// Permit2 contract address
     //const permit2: IAllowanceTransferDispatcher = IAllowanceTransferDispatcher {
     //    contract_address: 0xbeef.try_into().unwrap(),
     //};
+
     #[storage]
-    struct Storage {
+    pub struct Storage {
         _permit2: IAllowanceTransferDispatcher,
     }
 
-
-    //#[constructor]
-    //fn constructor(ref self: ContractState, _permit2: ContractAddress) {
-    //    let _permit2 = IAllowanceTransferSafeDispatcher { contract_address: _permit2 };
-    //    self._permit2.write(_permit2);
-    //}
 
     #[generate_trait]
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of InternalTrait<TContractState> {
+        /// Initialize the Permit2 contract address
+        /// NOTE: Can remove this once permit2 address is fixed and use const above
+        fn _initialize(ref self: ComponentState<TContractState>, permit2_address: ContractAddress) {
+            let _permit2 = IAllowanceTransferDispatcher { contract_address: permit2_address };
+            self._permit2.write(_permit2);
+        }
+
         /// Transfer a given amount of tokens from one user to another.
         ///
         /// Parameters:
@@ -60,6 +57,7 @@ pub mod Permit2Lib {
             // If the call fails, fall back to Permit2::transfer_from()
             if (!status.is_ok()) {
                 self._permit2.read().transfer_from(from, to, amount, token);
+                //permit2.transfer_from(from, to, amount, token);
             }
         }
 
@@ -92,11 +90,14 @@ pub mod Permit2Lib {
             if (domain_separator.is_ok()) {
                 let status = erc20.permit(owner, spender, amount, deadline, signature.span());
 
-                // If the permit fails, fall back to Permit2::permit()
-                if (!status.is_ok()) {
-                    self._simple_permit2(token, owner, spender, amount, deadline.into(), signature);
+                // If the permit succeeds, we are done
+                if (status.is_ok()) {
+                    return;
                 }
             }
+
+            // If there is no domain separator or permit fails, fall back to Permit2::permit()
+            self._simple_permit2(token, owner, spender, amount, deadline.into(), signature);
         }
 
         /// Simple unlimited permit on the Permit2 contract.
@@ -119,6 +120,7 @@ pub mod Permit2Lib {
         ) {
             let (_, _, nonce) = self._permit2.read().allowance(owner, token, spender);
 
+            //self.permit2
             self
                 ._permit2
                 .read()
@@ -126,12 +128,7 @@ pub mod Permit2Lib {
                     owner,
                     PermitSingle {
                         details: PermitDetails {
-                            token,
-                            amount,
-                            expiration: Bounded::<
-                                u64,
-                            >::MAX, // Use an unlimited expiration because it most closely mimics how a standard approval works.
-                            nonce,
+                            token, amount, expiration: Bounded::<u64>::MAX, nonce,
                         },
                         spender,
                         sig_deadline: deadline,
