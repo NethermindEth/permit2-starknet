@@ -2,6 +2,7 @@ use core::num::traits::Bounded;
 use openzeppelin_token::erc20::ERC20Component;
 use openzeppelin_token::erc20::interface::IERC20DispatcherTrait;
 use openzeppelin_utils::cryptography::snip12::OffchainMessageHash;
+use permit2::components::allowance_transfer::AllowanceTransferComponent;
 use permit2::components::allowance_transfer::AllowanceTransferComponent::{
     Approval, Lockdown, NonceInvalidation, Permit,
 };
@@ -62,13 +63,15 @@ fn test_approve_sets_allowance() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Approval {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                    },
+                    AllowanceTransferComponent::Event::Approval(
+                        Approval {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                        },
+                    ),
                 ),
             ],
         );
@@ -121,23 +124,27 @@ fn test_approve_overrides_previous_allowance() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Approval {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                    },
+                    AllowanceTransferComponent::Event::Approval(
+                        Approval {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                        },
+                    ),
                 ),
                 (
                     setup.permit2.contract_address,
-                    Approval {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT + 1,
-                        expiration: default_expiration + 1,
-                    },
+                    AllowanceTransferComponent::Event::Approval(
+                        Approval {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT + 1,
+                            expiration: default_expiration + 1,
+                        },
+                    ),
                 ),
             ],
         );
@@ -185,14 +192,16 @@ fn test_permit_sets_allowance() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
             ],
         );
@@ -284,36 +293,42 @@ fn test_permit_batch_sets_allowances() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE + 1,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE + 1,
+                        },
+                    ),
                 ),
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token1.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token1.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
             ],
         );
@@ -370,14 +385,16 @@ fn test_permit_allowance_transfer() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
             ],
         );
@@ -386,11 +403,13 @@ fn test_permit_allowance_transfer() {
             @array![
                 (
                     setup.token0.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: DEFAULT_AMOUNT,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: DEFAULT_AMOUNT,
+                        },
+                    ),
                 ),
             ],
         );
@@ -464,14 +483,16 @@ fn test_permit_batch_allowance_transfer_same_token() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
             ],
         );
@@ -480,19 +501,23 @@ fn test_permit_batch_allowance_transfer_same_token() {
             @array![
                 (
                     setup.token0.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: E18,
+                        },
+                    ),
                 ),
                 (
                     setup.token0.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: E18,
+                        },
+                    ),
                 ),
             ],
         );
@@ -598,25 +623,29 @@ fn test_permit_batch_allowance_transfer_different_tokens() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token1.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token1.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
             ],
         );
@@ -625,51 +654,63 @@ fn test_permit_batch_allowance_transfer_different_tokens() {
             @array![
                 (
                     setup.token0.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: E18,
+                        },
+                    ),
                 ),
                 (
                     setup.token0.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: E18,
+                        },
+                    ),
                 ),
                 (
                     setup.token0.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: E18,
+                        },
+                    ),
                 ),
                 (
                     setup.token1.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: E18,
+                        },
+                    ),
                 ),
                 (
                     setup.token1.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: E18,
+                        },
+                    ),
                 ),
                 (
                     setup.token1.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address,
-                        to: setup.to.account.contract_address,
-                        value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.to.account.contract_address,
+                            value: E18,
+                        },
+                    ),
                 ),
             ],
         );
@@ -921,13 +962,15 @@ fn test_invalidate_single_nonce() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    NonceInvalidation {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        new_nonce: 1,
-                        old_nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::NonceInvalidation(
+                        NonceInvalidation {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            new_nonce: 1,
+                            old_nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
             ],
         );
@@ -962,13 +1005,15 @@ fn test_invalidate_multiple_nonces_and_events() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    NonceInvalidation {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        new_nonce: 33,
-                        old_nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::NonceInvalidation(
+                        NonceInvalidation {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            new_nonce: 33,
+                            old_nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
             ],
         );
@@ -1137,25 +1182,29 @@ fn test_batch_transfer_from_different_owners() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
                 (
                     setup.permit2.contract_address,
-                    Permit {
-                        owner: setup.to.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                        amount: DEFAULT_AMOUNT,
-                        expiration: default_expiration,
-                        nonce: DEFAULT_NONCE,
-                    },
+                    AllowanceTransferComponent::Event::Permit(
+                        Permit {
+                            owner: setup.to.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                            amount: DEFAULT_AMOUNT,
+                            expiration: default_expiration,
+                            nonce: DEFAULT_NONCE,
+                        },
+                    ),
                 ),
             ],
         );
@@ -1164,15 +1213,23 @@ fn test_batch_transfer_from_different_owners() {
             @array![
                 (
                     setup.token0.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.from.account.contract_address, to: setup.bystander, value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.from.account.contract_address,
+                            to: setup.bystander,
+                            value: E18,
+                        },
+                    ),
                 ),
                 (
                     setup.token0.contract_address,
-                    ERC20Component::Transfer {
-                        from: setup.to.account.contract_address, to: setup.bystander, value: E18,
-                    },
+                    ERC20Component::Event::Transfer(
+                        ERC20Component::Transfer {
+                            from: setup.to.account.contract_address,
+                            to: setup.bystander,
+                            value: E18,
+                        },
+                    ),
                 ),
             ],
         );
@@ -1265,19 +1322,23 @@ fn test_lockdown() {
             @array![
                 (
                     setup.permit2.contract_address,
-                    Lockdown {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token0.contract_address,
-                        spender: setup.bystander,
-                    },
+                    AllowanceTransferComponent::Event::Lockdown(
+                        Lockdown {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token0.contract_address,
+                            spender: setup.bystander,
+                        },
+                    ),
                 ),
                 (
                     setup.permit2.contract_address,
-                    Lockdown {
-                        owner: setup.from.account.contract_address,
-                        token: setup.token1.contract_address,
-                        spender: setup.bystander,
-                    },
+                    AllowanceTransferComponent::Event::Lockdown(
+                        Lockdown {
+                            owner: setup.from.account.contract_address,
+                            token: setup.token1.contract_address,
+                            spender: setup.bystander,
+                        },
+                    ),
                 ),
             ],
         );
