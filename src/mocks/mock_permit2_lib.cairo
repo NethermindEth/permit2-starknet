@@ -1,4 +1,4 @@
-#[starknet::contract(account)]
+#[starknet::component]
 mod MockPermit2Lib {
     use openzeppelin_account::AccountComponent;
     use openzeppelin_introspection::src5::SRC5Component;

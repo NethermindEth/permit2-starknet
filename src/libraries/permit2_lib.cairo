@@ -1,43 +1,37 @@
-// Fallback: transfer_from, permit1, then permit2,
-
-use core::num::traits::Bounded;
-use openzeppelin_token::erc20::interface::{
-    IERC20Dispatcher, IERC20DispatcherTrait, IERC20PermitDispatcher, IERC20PermitDispatcherTrait,
-};
-use openzeppelin_token::erc20::snip12_utils::permit::Permit;
-use permit2::components::interfaces::allowance_transfer::{PermitDetails, PermitSingle};
 use starknet::ContractAddress;
 
 #[starknet::component]
 pub mod Permit2Lib {
-    use permit2::interfaces::allowance_transfer::{
-        IAllowanceTransferDispatcher, IAllowanceTransferDispatcherTrait,
+    use core::num::traits::Bounded;
+    use openzeppelin_token::erc20::interface::{
+        IERC20PermitSafeDispatcher, IERC20PermitSafeDispatcherTrait, IERC20SafeDispatcher,
+        IERC20SafeDispatcherTrait,
     };
-    use permit2::interfaces::unordered_nonces::IUnorderedNonces;
-    use permit2::libraries::bitmap::{BitmapPackingTrait, BitmapTrait};
+    use permit2::interfaces::allowance_transfer::{
+        IAllowanceTransferDispatcher, IAllowanceTransferDispatcherTrait, PermitDetails,
+        PermitSingle,
+    };
     use starknet::ContractAddress;
     use starknet::storage::{
         Map, StoragePathEntry, StoragePointerReadAccess, StoragePointerWriteAccess,
     };
 
-    const permit2: IAllowanceTransferDispatcher = IAllowanceTransferDispatcher {
-        contract_address: 0xbeef.try_into().unwrap(),
-    };
 
     /// NOTE: Can remove storage and constructor once permit2 address is fixed
+    //const permit2: IAllowanceTransferDispatcher = IAllowanceTransferDispatcher {
+    //    contract_address: 0xbeef.try_into().unwrap(),
+    //};
     #[storage]
     struct Storage {
-        permit2: ContractAddress,
-        #[substorage(v0)]
-        permit2_lib: Permit2Lib::Storage,
+        _permit2: IAllowanceTransferDispatcher,
     }
 
 
-    #[constructor]
-    fn constructor(ref self: ContractState, permit2: ContractAddress) {
-        self.permit2.write(permit2);
-    }
-
+    //#[constructor]
+    //fn constructor(ref self: ContractState, _permit2: ContractAddress) {
+    //    let _permit2 = IAllowanceTransferSafeDispatcher { contract_address: _permit2 };
+    //    self._permit2.write(_permit2);
+    //}
 
     #[generate_trait]
     pub impl InternalImpl<
@@ -51,18 +45,21 @@ pub mod Permit2Lib {
         /// - `from`: The user to transfer from.
         /// - `to`: The` user to transfer to.
         /// - `amount`: The amount to transfer.
+        #[feature("safe_dispatcher")]
         fn _transfer_from2(
             ref self: ComponentState<TContractState>,
-            token: IERC20Dispatcher,
+            token: ContractAddress,
             from: ContractAddress,
             to: ContractAddress,
             amount: u256,
         ) {
-            let erc20 = IERC20PermitDispatcher { contract_address: token };
-            let success = erc20.transfer_from(from, to, amount);
+            // First try IERC20Component::transfer_from()
+            let erc20 = IERC20SafeDispatcher { contract_address: token };
+            let status = erc20.transfer_from(from, to, amount);
 
-            if (!success) {
-                permit2.transfer_from(from, to, amount)
+            // If the call fails, fall back to Permit2::transfer_from()
+            if (!status.is_ok()) {
+                self._permit2.read().transfer_from(from, to, amount, token);
             }
         }
 
@@ -78,39 +75,39 @@ pub mod Permit2Lib {
         /// `amount`: The amount to permit spending.
         /// `deadline`:  The timestamp after which the signature is no longer valid.
         /// `signature`:  The signature of the permit.
+        #[feature("safe_dispatcher")]
         fn _permit2(
             ref self: ComponentState<TContractState>,
             token: ContractAddress,
             owner: ContractAddress,
             spender: ContractAddress,
             amount: u256,
-            deadline: u256,
-            signature: Span<felt252>,
-        ) { // Get token domain seperator
-            // If success, try to call erc20::permit
+            deadline: u64,
+            signature: Array<felt252>,
+        ) {
+            let erc20 = IERC20PermitSafeDispatcher { contract_address: token };
+            let domain_separator = erc20.DOMAIN_SEPARATOR();
 
-            // use safe dispatcher ? can we yet ?
-            let erc20 = IERC20PermitDispatcher { contract_address: token };
-            let domain_seperator = erc20.DOMAIN_SEPERATOR();
+            // First try ERC20Permit::permit() if the token supports it
+            if (domain_separator.is_ok()) {
+                let status = erc20.permit(owner, spender, amount, deadline, signature.span());
 
-            if (domain_seperator) {
-                erc20.permit(owner, spender, amount, deadline, signature);
-            } else {
-                // Get domain seperator if it exists
-                // use safe dispatcher ? can we yet ?
-                let erc20 = IERC20PermitDispatcher { contract_address: token };
-                let domain_seperator = erc20.DOMAIN_SEPERATOR();
-
-                // If there is a domain seperator, try class ERC20Permit::permit()
-                if (domain_seperator) {
-                    erc20.permit(owner, spender, amount, deadline, signature);
-                } // If no domain seperator, use Permit2::permit()
-                else {
-                    self._permit2_simple(token, owner, spender, amount, deadline, signature);
+                // If the permit fails, fall back to Permit2::permit()
+                if (!status.is_ok()) {
+                    self._simple_permit2(token, owner, spender, amount, deadline.into(), signature);
                 }
             }
         }
 
+        /// Simple unlimited permit on the Permit2 contract.
+        ///
+        /// Parameters:
+        /// - `token`: The token to permit spending.
+        /// - `owner`: The user to permit spending from.
+        /// - `spender`: The user to permit spending to.
+        /// - `amount`: The amount to permit spending.
+        /// - `deadline`: The timestamp after which the signature is no longer valid.
+        /// - `signature`: The signature of the pemrit
         fn _simple_permit2(
             ref self: ComponentState<TContractState>,
             token: ContractAddress,
@@ -118,11 +115,13 @@ pub mod Permit2Lib {
             spender: ContractAddress,
             amount: u256,
             deadline: u256,
-            signature: Span<felt252>,
+            signature: Array<felt252>,
         ) {
-            let (_, _, nonce) = permit2.allowance(owner, token, spender);
+            let (_, _, nonce) = self._permit2.read().allowance(owner, token, spender);
 
-            permit2
+            self
+                ._permit2
+                .read()
                 .permit(
                     owner,
                     PermitSingle {
@@ -130,7 +129,7 @@ pub mod Permit2Lib {
                             token,
                             amount,
                             expiration: Bounded::<
-                                u256,
+                                u64,
                             >::MAX, // Use an unlimited expiration because it most closely mimics how a standard approval works.
                             nonce,
                         },
