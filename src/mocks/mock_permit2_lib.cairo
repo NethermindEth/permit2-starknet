@@ -1,3 +1,27 @@
+use starknet::ContractAddress;
+
+#[starknet::interface]
+pub trait IMockPermit2Lib<TState> {
+    fn transfer_from2(
+        ref self: TState,
+        token: ContractAddress,
+        from: ContractAddress,
+        to: ContractAddress,
+        amount: u256,
+    );
+
+    /// @dev `_` added to avoid conflict with the module named `permit2`
+    fn permit2_(
+        ref self: TState,
+        token: ContractAddress,
+        owner: ContractAddress,
+        spender: ContractAddress,
+        amount: u256,
+        deadline: u64,
+        signature: Array<felt252>,
+    );
+}
+
 #[starknet::contract]
 mod MockPermit2Lib {
     use permit2::libraries::permit2_lib::Permit2Lib;
@@ -25,26 +49,28 @@ mod MockPermit2Lib {
         self.permit2_lib._initialize(permit2_address);
     }
 
-    fn transfer_from2(
-        ref self: ContractState,
-        token: ContractAddress,
-        from: ContractAddress,
-        to: ContractAddress,
-        amount: u256,
-    ) {
-        self.permit2_lib._transfer_from2(token, from, to, amount);
-    }
+    #[abi(embed_v0)]
+    impl MockPermit2LibImpl of super::IMockPermit2Lib<ContractState> {
+        fn transfer_from2(
+            ref self: ContractState,
+            token: ContractAddress,
+            from: ContractAddress,
+            to: ContractAddress,
+            amount: u256,
+        ) {
+            self.permit2_lib._transfer_from2(token, from, to, amount);
+        }
 
-    /// @dev `_` added to avoid conflict with the module named `permit2`
-    fn permit2_(
-        ref self: ContractState,
-        token: ContractAddress,
-        owner: ContractAddress,
-        spender: ContractAddress,
-        amount: u256,
-        deadline: u64,
-        signature: Array<felt252>,
-    ) {
-        self.permit2_lib._permit2(token, owner, spender, amount, deadline, signature);
+        fn permit2_(
+            ref self: ContractState,
+            token: ContractAddress,
+            owner: ContractAddress,
+            spender: ContractAddress,
+            amount: u256,
+            deadline: u64,
+            signature: Array<felt252>,
+        ) {
+            self.permit2_lib._permit2(token, owner, spender, amount, deadline, signature);
+        }
     }
 }
