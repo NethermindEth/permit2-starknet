@@ -7,3 +7,5 @@ pub mod unordered_nonces_test;
 pub mod utils {
     pub mod mock_structs;
 }
+pub mod allowance_unit_test;
+pub mod snip12_test;

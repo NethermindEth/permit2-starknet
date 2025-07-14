@@ -1,9 +1,14 @@
 #[starknet::contract]
 pub mod Permit2 {
-    use openzeppelin_utils::cryptography::snip12::SNIP12Metadata;
+    use openzeppelin_utils::cryptography::snip12::{
+        SNIP12Metadata, StarknetDomain, StructHashStarknetDomainImpl,
+    };
     use permit2::components::allowance_transfer::AllowanceTransferComponent;
     use permit2::components::signature_transfer::SignatureTransferComponent;
     use permit2::components::unordered_nonces::UnorderedNoncesComponent;
+    use permit2::interfaces::permit2::IPermit2;
+    use starknet::get_tx_info;
+
 
     component!(
         path: AllowanceTransferComponent, storage: allowed_transfer, event: AllowedTransferEvent,
@@ -22,7 +27,6 @@ pub mod Permit2 {
     #[abi(embed_v0)]
     impl SignatureTransferImpl =
         SignatureTransferComponent::SignatureTransferImpl<ContractState>;
-
 
     #[abi(embed_v0)]
     impl UnorderedNoncesImpl =
@@ -58,6 +62,20 @@ pub mod Permit2 {
         /// Returns the version of the SNIP-12 metadata.
         fn version() -> felt252 {
             'v1'
+        }
+    }
+
+    #[abi(embed_v0)]
+    pub impl Permit2 of IPermit2<ContractState> {
+        fn DOMAIN_SEPARATOR(self: @ContractState) -> felt252 {
+            let domain = StarknetDomain {
+                name: SNIP12MetadataImpl::name(),
+                version: SNIP12MetadataImpl::version(),
+                chain_id: get_tx_info().unbox().chain_id,
+                revision: 1,
+            };
+
+            domain.hash_struct()
         }
     }
 }
