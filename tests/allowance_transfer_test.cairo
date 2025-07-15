@@ -26,12 +26,8 @@ use starknet::get_block_timestamp;
 use crate::common::E18;
 use crate::setup::setupAT as setup;
 
-
 const DEFAULT_AMOUNT: u256 = 30 * E18;
 const DEFAULT_NONCE: u64 = 0;
-
-/////////// TODO: CHECK EVENTS ON SIGNATURE TRANSFER FROM ////////////////
-// test using nonce 1 at start
 
 #[test]
 fn test_approve_sets_allowance() {

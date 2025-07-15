@@ -1,15 +1,8 @@
-// drop ?
-#[starknet::interface]
-pub trait IPermitWithDS<TState> {
-    fn DOMAIN_SEPARATOR(self: @TState) -> felt252;
-    fn mint(ref self: TState, recipient: starknet::ContractAddress, amount: u256);
-}
-
 #[starknet::contract]
 pub mod MockPermitWithSmallDS {
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::ContractAddress;
-    use super::IPermitWithDS;
+    use crate::mocks::common::IPermitWithDS;
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 
@@ -31,16 +24,8 @@ pub mod MockPermitWithSmallDS {
     }
 
     #[constructor]
-    fn constructor(
-        ref self: ContractState,
-        name: ByteArray,
-        symbol: ByteArray,
-        initial_supply: u256,
-        recipient: ContractAddress,
-        owner: ContractAddress,
-    ) {
+    fn constructor(ref self: ContractState, name: ByteArray, symbol: ByteArray) {
         self.erc20.initializer(name, symbol);
-        self.erc20.mint(recipient, initial_supply);
     }
 
 
@@ -64,7 +49,7 @@ pub mod MockPermitWithSmallDS {
 pub mod MockPermitWithLargerDS {
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::ContractAddress;
-    use super::IPermitWithDS;
+    use crate::mocks::common::IPermitWithDS;
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 
@@ -86,16 +71,8 @@ pub mod MockPermitWithLargerDS {
     }
 
     #[constructor]
-    fn constructor(
-        ref self: ContractState,
-        name: ByteArray,
-        symbol: ByteArray,
-        initial_supply: u256,
-        recipient: ContractAddress,
-        owner: ContractAddress,
-    ) {
+    fn constructor(ref self: ContractState, name: ByteArray, symbol: ByteArray) {
         self.erc20.initializer(name, symbol);
-        self.erc20.mint(recipient, initial_supply);
     }
 
 

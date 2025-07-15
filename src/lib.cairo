@@ -18,16 +18,6 @@ pub mod libraries {
     pub mod utils;
 }
 
-pub mod mocks {
-    pub mod mock_account;
-    pub mod mock_erc20;
-    pub mod mock_erc20_permit;
-    pub mod mock_non_permit_token;
-    pub mod mock_permit2;
-    pub mod mock_permit2_lib;
-    pub mod mock_permit_with_ds;
-    pub mod mock_witness;
-}
 
 pub mod snip12_utils {
     pub mod permits;

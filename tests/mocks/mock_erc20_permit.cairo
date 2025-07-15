@@ -1,14 +1,10 @@
-#[starknet::interface]
-pub trait IMintable<TContractState> {
-    fn mint(ref self: TContractState, recipient: starknet::ContractAddress, amount: u256);
-}
-
 #[starknet::contract]
 pub mod MockERC20Permit {
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use openzeppelin_utils::cryptography::nonces::NoncesComponent;
     use openzeppelin_utils::cryptography::snip12::SNIP12Metadata;
     use starknet::ContractAddress;
+    use crate::mocks::common::IMintable;
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
     component!(path: NoncesComponent, storage: nonces, event: NoncesEvent);
@@ -61,7 +57,7 @@ pub mod MockERC20Permit {
     }
 
     #[abi(embed_v0)]
-    impl MintableImpl of super::IMintable<ContractState> {
+    impl MintableImpl of IMintable<ContractState> {
         fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256) {
             self.erc20.mint(recipient, amount);
         }
