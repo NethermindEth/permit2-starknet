@@ -8,4 +8,5 @@ pub mod utils {
     pub mod mock_structs;
 }
 pub mod allowance_unit_test;
+pub mod nonce_bitmap_test;
 pub mod snip12_test;
