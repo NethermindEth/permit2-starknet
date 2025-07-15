@@ -126,8 +126,6 @@ fn test_invalidate_nonzero_nonce_space() {
     let nonce_space = 1;
     let mask: felt252 = (2_u256.pow(251) - 1).try_into().expect('mask should fit in felt252');
 
-    println!("Mask: {mask}, nonce_space: {nonce_space}");
-
     assert(
         p2.invalidate_unordered_nonces(nonce_space, mask).is_ok(), 'Invalidation should succeed',
     );
