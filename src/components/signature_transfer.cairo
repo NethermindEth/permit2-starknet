@@ -20,10 +20,10 @@ pub mod SignatureTransferComponent {
 
     /// ERRORS ///
     pub mod Errors {
-        pub const SignatureExpired: felt252 = 'ST: signature expired';
-        pub const LengthMismatch: felt252 = 'ST: length mismatch';
-        pub const InvalidSignature: felt252 = 'ST: invalid signature';
-        pub const InvalidAmount: felt252 = 'ST: invalid amount';
+        pub const SIGNATURE_EXPIRED: felt252 = 'ST: signature expired';
+        pub const LENGTH_MISMATCH: felt252 = 'ST: length mismatch';
+        pub const INVALID_SIGNATURE: felt252 = 'ST: invalid signature';
+        pub const INVALID_AMOUNT: felt252 = 'ST: invalid amount';
     }
 
     /// STORAGE ///
@@ -128,12 +128,12 @@ pub mod SignatureTransferComponent {
             // Validate signature deadline
             assert(
                 starknet::get_block_timestamp() <= permit.deadline.try_into().unwrap(),
-                Errors::SignatureExpired,
+                Errors::SIGNATURE_EXPIRED,
             );
 
             // Validate transfer amount <= permitted amount
             let requested_amount = transfer_details.requested_amount;
-            assert(requested_amount <= permit.permitted.amount, Errors::InvalidAmount);
+            assert(requested_amount <= permit.permitted.amount, Errors::INVALID_AMOUNT);
 
             // Use nonce
             let mut nonces_component = get_dep_component_mut!(ref self, Nonces);
@@ -142,7 +142,7 @@ pub mod SignatureTransferComponent {
             // Validate signature
             let src6_dispatcher = ISRC6Dispatcher { contract_address: owner };
             let is_valid = src6_dispatcher.is_valid_signature(data_hash, signature);
-            assert(is_valid == starknet::VALIDATED, Errors::InvalidSignature);
+            assert(is_valid == starknet::VALIDATED, Errors::INVALID_SIGNATURE);
 
             // Transfer tokens
             /// TODO: Assert return value
@@ -162,11 +162,11 @@ pub mod SignatureTransferComponent {
             // Validate signature deadline
             assert(
                 starknet::get_block_timestamp() <= permit.deadline.try_into().unwrap(),
-                Errors::SignatureExpired,
+                Errors::SIGNATURE_EXPIRED,
             );
 
             // Validate permit & transfer detail lengths
-            assert(permit.permitted.len() == transfer_details.len(), Errors::LengthMismatch);
+            assert(permit.permitted.len() == transfer_details.len(), Errors::LENGTH_MISMATCH);
 
             // Use nonce
             let mut nonces_component = get_dep_component_mut!(ref self, Nonces);
@@ -175,7 +175,7 @@ pub mod SignatureTransferComponent {
             // Validate signature
             let src6_dispatcher = ISRC6Dispatcher { contract_address: owner };
             let is_valid = src6_dispatcher.is_valid_signature(data_hash, signature);
-            assert(is_valid == starknet::VALIDATED, Errors::InvalidSignature);
+            assert(is_valid == starknet::VALIDATED, Errors::INVALID_SIGNATURE);
 
             // Iterate over each permitted token and transfer detail
             for (permitted, transfer_detail) in permit.permitted.into_iter().zip(transfer_details) {

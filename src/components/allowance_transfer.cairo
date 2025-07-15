@@ -19,11 +19,11 @@ pub mod AllowanceTransferComponent {
 
     /// ERRORS ///
     pub mod Errors {
-        pub const SignatureExpired: felt252 = 'AT: signature expired';
-        pub const AllowanceExpired: felt252 = 'AT: allowance expired';
-        pub const InvalidNonce: felt252 = 'AT: invalid nonce';
-        pub const InvalidSignature: felt252 = 'AT: invalid signature';
-        pub const ExcessiveNonceDelta: felt252 = 'AT: excessive nonce delta';
+        pub const SIGNATURE_EXPIRED: felt252 = 'AT: signature expired';
+        pub const ALLOWANCE_EXPIRED: felt252 = 'AT: allowance expired';
+        pub const INVALID_NONCE: felt252 = 'AT: invalid nonce';
+        pub const INVALID_SIGNATURE: felt252 = 'AT: invalid signature';
+        pub const EXCESSIVE_NONCE_DELTA: felt252 = 'AT: excessive nonce delta';
     }
 
     /// STORAGE ///
@@ -138,14 +138,14 @@ pub mod AllowanceTransferComponent {
         ) {
             assert(
                 get_block_timestamp() <= permit.sig_deadline.try_into().unwrap(),
-                Errors::SignatureExpired,
+                Errors::SIGNATURE_EXPIRED,
             );
 
             let message_hash = permit.get_message_hash(owner);
             let src6_dispatcher = ISRC6Dispatcher { contract_address: owner };
             assert(
                 src6_dispatcher.is_valid_signature(message_hash, signature) == VALIDATED,
-                Errors::InvalidSignature,
+                Errors::INVALID_SIGNATURE,
             );
             self._update_approval(permit.details, owner, permit.spender);
         }
@@ -158,7 +158,7 @@ pub mod AllowanceTransferComponent {
         ) {
             assert(
                 get_block_timestamp() <= permit.sig_deadline.try_into().unwrap(),
-                Errors::SignatureExpired,
+                Errors::SIGNATURE_EXPIRED,
             );
 
             let message_hash = permit.get_message_hash(owner);
@@ -166,7 +166,7 @@ pub mod AllowanceTransferComponent {
 
             assert(
                 src6_dispatcher.is_valid_signature(message_hash, signature) == VALIDATED,
-                Errors::InvalidSignature,
+                Errors::INVALID_SIGNATURE,
             );
 
             let spender = permit.spender;
@@ -218,9 +218,11 @@ pub mod AllowanceTransferComponent {
             let allowance_storage = self.allowance.entry((owner, token, spender));
             let mut allowed = allowance_storage.read();
             let old_nonce = allowed.nonce;
-            assert(new_nonce > old_nonce, Errors::InvalidNonce);
+            assert(new_nonce > old_nonce, Errors::INVALID_NONCE);
             /// Assert delta is less than u16 max.
-            assert(new_nonce - old_nonce < Bounded::<u16>::MAX.into(), Errors::ExcessiveNonceDelta);
+            assert(
+                new_nonce - old_nonce < Bounded::<u16>::MAX.into(), Errors::EXCESSIVE_NONCE_DELTA,
+            );
             allowed.nonce = new_nonce;
             allowance_storage.write(allowed);
             self.emit(NonceInvalidation { owner, token, spender, new_nonce, old_nonce });
@@ -243,7 +245,7 @@ pub mod AllowanceTransferComponent {
                 .allowance
                 .entry((from, token, starknet::get_caller_address()));
             let mut allowed = allowance_storage.read();
-            assert(get_block_timestamp() <= allowed.expiration, Errors::AllowanceExpired);
+            assert(get_block_timestamp() <= allowed.expiration, Errors::ALLOWANCE_EXPIRED);
 
             if allowed.amount != Bounded::MAX {
                 allowed.amount -= amount;
@@ -261,7 +263,7 @@ pub mod AllowanceTransferComponent {
             spender: ContractAddress,
         ) {
             let mut allowance_storage = self.allowance.entry((owner, details.token, spender));
-            assert(details.nonce == allowance_storage.read().nonce, Errors::InvalidNonce);
+            assert(details.nonce == allowance_storage.read().nonce, Errors::INVALID_NONCE);
 
             allowance_storage.update_all(details.amount, details.expiration, details.nonce);
             self
