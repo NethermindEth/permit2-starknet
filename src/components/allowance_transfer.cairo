@@ -241,9 +241,7 @@ pub mod AllowanceTransferComponent {
             amount: u256,
             token: ContractAddress,
         ) {
-            let mut allowance_storage = self
-                .allowance
-                .entry((from, token, starknet::get_caller_address()));
+            let mut allowance_storage = self.allowance.entry((from, token, get_caller_address()));
             let mut allowed = allowance_storage.read();
             assert(get_block_timestamp() <= allowed.expiration, Errors::ALLOWANCE_EXPIRED);
 

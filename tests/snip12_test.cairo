@@ -2,7 +2,7 @@ use core::hash::{HashStateExTrait, HashStateTrait};
 use core::poseidon::PoseidonTrait;
 use permit2::interfaces::permit2::{IPermit2Dispatcher, IPermit2DispatcherTrait};
 use snforge_std::{start_cheat_chain_id_global, stop_cheat_chain_id_global};
-use starknet::{ContractAddress, get_caller_address, get_tx_info};
+use starknet::get_tx_info;
 use crate::setup::deploy_permit2;
 
 const STARKNET_DOMAIN_TYPE_HASH: felt252 = selector!(

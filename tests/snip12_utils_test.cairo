@@ -1,9 +1,6 @@
 use openzeppelin_utils::cryptography::snip12::{OffchainMessageHash, SNIP12HashSpanImpl, StructHash};
 use permit2::interfaces::allowance_transfer::{PermitBatch, PermitSingle};
 use permit2::interfaces::signature_transfer::{PermitBatchTransferFrom, PermitTransferFrom};
-use permit2::mocks::mock_witness::{
-    BetaStructHash, MockWitnessStructHash, _WITNESS_TYPE_STRING_FULL,
-};
 use permit2::permit2::Permit2::SNIP12MetadataImpl;
 use permit2::snip12_utils::permits::{
     PermitBatchStructHash, PermitBatchTransferFromOffChainMessageHashWitness,
@@ -16,6 +13,7 @@ use permit2::snip12_utils::permits::{
     _PERMIT_WITNESS_TRANSFER_FROM_TYPE_HASH, _TOKEN_PERMISSIONS_TYPE_HASH, _U256_TYPE_HASH,
 };
 use snforge_std::{start_cheat_caller_address_global, stop_cheat_caller_address_global};
+use crate::mocks::mock_witness::{BetaStructHash, MockWitnessStructHash, _WITNESS_TYPE_STRING_FULL};
 use crate::utils::mock_structs::{
     make_permit_batch, make_permit_batch_transfer_from, make_permit_single,
     make_permit_transfer_from, make_witness, owner, spender,

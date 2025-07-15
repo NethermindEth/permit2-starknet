@@ -7,10 +7,6 @@ use permit2::interfaces::signature_transfer::{
     SignatureTransferDetails, TokenPermissions,
 };
 use permit2::libraries::bitmap::{BitmapPackingTrait, MASK_8, SHIFT_8};
-use permit2::mocks::mock_erc20::{IMintableDispatcher, IMintableDispatcherTrait};
-use permit2::mocks::mock_witness::{
-    Beta, MockWitness, Zeta, _MOCK_WITNESS_TYPE_STRING, _WITNESS_TYPE_STRING_FULL,
-};
 use permit2::permit2::Permit2::SNIP12MetadataImpl;
 use permit2::snip12_utils::permits::{
     OffchainMessageHashWitnessTrait, PermitBatchStructHash, PermitBatchTransferFromStructHash,
@@ -26,12 +22,14 @@ use snforge_std::{
 };
 use starknet::get_block_timestamp;
 use crate::common::E18;
+use crate::mocks::common::{IMintableDispatcher, IMintableDispatcherTrait};
+use crate::mocks::mock_witness::{
+    Beta, MockWitness, Zeta, _MOCK_WITNESS_TYPE_STRING, _WITNESS_TYPE_STRING_FULL,
+};
 use crate::setup::setupST as setup;
 use crate::utils::mock_structs::make_witness;
 
-
 pub const DEFAULT_AMOUNT: u256 = E18;
-
 
 #[test]
 fn test_permit_transfer_from() {

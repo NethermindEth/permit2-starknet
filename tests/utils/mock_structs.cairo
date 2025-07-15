@@ -2,7 +2,6 @@ use permit2::interfaces::allowance_transfer::{PermitBatch, PermitDetails, Permit
 use permit2::interfaces::signature_transfer::{
     PermitBatchTransferFrom, PermitTransferFrom, TokenPermissions,
 };
-use permit2::mocks::mock_witness::{Beta, MockWitness, MockWitnessStructHash, Zeta};
 use permit2::permit2::Permit2::SNIP12MetadataImpl;
 use permit2::snip12_utils::permits::{
     PermitBatchStructHash, PermitBatchTransferFromStructHash,
@@ -11,6 +10,7 @@ use permit2::snip12_utils::permits::{
     U256StructHash,
 };
 use starknet::ContractAddress;
+use crate::mocks::mock_witness::{Beta, MockWitness, MockWitnessStructHash, Zeta};
 
 
 pub const spender: ContractAddress = 0x5678.try_into().unwrap();

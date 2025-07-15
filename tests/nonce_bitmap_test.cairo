@@ -1,14 +1,14 @@
-use core::num::traits::{Bounded, Pow};
+use core::num::traits::Pow;
 use permit2::components::unordered_nonces::UnorderedNoncesComponent::Error;
 use permit2::interfaces::unordered_nonces::{
     IUnorderedNoncesSafeDispatcher, IUnorderedNoncesSafeDispatcherTrait,
 };
 use permit2::libraries::bitmap::{
-    BIT_POSITION_OVERFLOW, BitmapPackingTrait, BitmapTrait, FeltBitmapPackingTraitImpl,
-    FeltBitmapTraitImpl, INDEX_OUT_OF_RANGE, MASK_8, NONCE_SPACE_OVERFLOW, SHIFT_8,
+    BIT_POSITION_OVERFLOW, BitmapPackingTrait, FeltBitmapPackingTraitImpl, FeltBitmapTraitImpl,
+    INDEX_OUT_OF_RANGE, MASK_8, NONCE_SPACE_OVERFLOW, SHIFT_8,
 };
-use permit2::mocks::mock_permit2::{IMockPermit2SafeDispatcher, IMockPermit2SafeDispatcherTrait};
 use starknet::get_contract_address;
+use crate::mocks::mock_permit2::{IMockPermit2SafeDispatcher, IMockPermit2SafeDispatcherTrait};
 use crate::setup::deploy_mock_permit2;
 
 
