@@ -35,7 +35,7 @@ impl AllowancePacking of StorePacking<Allowance, (u256, u64, u64)> {
 }
 
 
-impl AllowanceImpl of AllowanceTrait {
+pub impl AllowanceImpl of AllowanceTrait {
     const BLOCK_TIMESTAMP_EXPIRATION: u64 = 0;
 
     fn update_all(
