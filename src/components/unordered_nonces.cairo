@@ -1,66 +1,70 @@
-//! The `UnorderedNoncesComponent` is designed for concurrent usage of nonces.
-//!
-//! Nonces are represented in this component as a mapping from an owner and nonce space to a bitmap
-//! of 252 nonces. Each nonce space corresponds to a unique identifier, and the bitmap efficiently
-//! tracks the status of each nonce within that space. Each bit in the bitmap represents a nonce,
-//! where a value of 1 indicates that the nonce is invalidated, and a value of 0 indicates that it
-//! is usable.
-//!
-//! Each nonce is identified by its `nonce space` and `nonce position`. For more efficient
-//! serialization, information can be compactly packed into a single felt as follows:
-//!   1. The lower 8 bits (bit_pos)       → Represents the index (0 to 251).
-//!   2. The remaining 244 bits          → Represents the unique nonce space.
-//!
-//! For example, a single packed nonce looks like this when represented in felt:
-//!
-//! Packed Nonce Representation (252 bits):
-//! +----------------------------------------------------------------------------------+
-//! |                     8 bits for nonce position   |    244 bits for nonce space
-//! |  Bit Index:     | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | ... | 251 |
-//! |  Packed Nonce:  | 0 | 1 |  0 | 0 | 0 |... | 0 | 0 | 1 | 1 | 1 |
-//!
-//! In storage, the nonce is a `Map<(ContractAddress, felt252), felt252>` mapping (owner,
-//! nonce_space) to a bitmap representing 252 nonces, explained as follows:
-//!
-//! Nonce bitmap representation:
-//!
-//! Bit Index:     | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | 251 |
-//! Nonce Bitmap:  | 0 | 0 | 1 | 0 | 1 | 1 | 0 | 0 | ... | 0 |
-//!
-//! In this example, nonces 2, 4, and 5 are invalidated (set to 1) while others remain usable (set
-//! to 0).
-//!
-//! The packed nonce format allows for the representation of up to 252 nonces in a single felt252
-//! slot, enabling the invalidation of multiple nonces at once. This is particularly useful for
-//! batch operations where several nonces need to be revoked simultaneously.
-//!
-//! Nonce invalidation:
-//!
-//! Bit Index:     | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | 251 |
-//! Nonce Bitmap:  | 0 | 0 | 1 | 0 | 1 | 1 | 0 | 0 | ... | 0 |
-//! Mask:          | 0 | 1 | 0 | 1 | 1 | 0 | 0 | 0 | ... | 1 |
-//! Bitwise OR  ____________________________________________________
-//!
-//! Result:        | 0 | 1 | 1 | 1 | 1 | 1 | 0 | 0 | ... | 1 |
-//!
-//! In this example, nonces 1, 3, and 251 are invalidated (set to 1).
-//!
-//! Features:
-//!
-//! - **Revoking Nonces**: An external function to invalidate single or multiple nonces in a nonce
-//! space and an internal function that consumes a nonce represented in compact (nonce_space,
-//! bitpos)
-//! format. If a nonce is already consumed, it panics.
-//!
-//! - **Querying availability of nonces**: Functions to determine if a given nonce is usable or not.
+/// The `UnorderedNoncesComponent` is designed for concurrent usage of nonces.
+///
+/// Nonces are represented in this component as a mapping from an owner and nonce space to a bitmap
+/// of 251 nonces. Each nonce space corresponds to a unique identifier, and the bitmap efficiently
+/// tracks the status of each nonce within that space.
+///
+/// Each bit in the bitmap represents a nonce, where a value of 1 indicates that the nonce is
+/// invalidated, and a value of 0 indicates that it is usable. Even though this bitmap is
+/// represented as a `felt252`, it can only represent 251 nonces (bits). This is because the maximum
+/// value of a felt252 is less than the maximum value of an unsigned integer of size 252 (max u252 =
+/// 2^252 - 1, max felt252 = 2^251 + 17 * 2^192).
+///
+/// Each nonce is identified by its `nonce space` and `bit position`. For more efficient
+/// serialization, information can be compactly packed into a single felt as follows:
+///   1. The lower 8 bits (bit_pos) → Represents the index (0 to 250).
+///   2. The remaining 244 bits     → Represents the unique nonce space.
+///
+/// In storage, the nonce is a `Map<(ContractAddress, felt252), felt252>`. This map maps (owner,
+/// nonce_space) to a bitmap representing 251 nonces, explained as follows:
+///
+/// Example nonce: 904625697166532776746648320380374280103671755200316906558262375061821325323
+///
+/// Nonce as binary: 0b001000...0001011 (252 bits)
+///
+/// Packed Nonce Representation:
+///         | (First 8 bits)|     (Last 244 bits )          |
+///         <-bit position->|<---------nonce space---------->
+/// Bitmap: |1|1|0|1|0|0|0|0|0|0|0|0|0|0|...| 0 | 1 | 0 | 0 |
+/// Index:  |0|1|2|3|4|5|6|7|8|    ...      |249|250|251|252|
+///
+/// In this example, the upper 244 bits represent the nonce space (0b0100...0000). The
+/// lower 8 bits (0b00001011) mean that the nonces 0, 1, and 3 in this nonce space are
+/// invalidated (set to 1). This nonce would be stored as Map(owner, 0b010...000) = 0b1011.
+///
+/// The packed nonce format allows for the representation of up to 251 nonces in a single felt252
+/// slot, enabling the invalidation of multiple nonces at once. This is particularly useful for
+/// batch operations where several nonces need to be revoked simultaneously.
+///
+/// Nonce invalidation:
+///
+/// Bit Index:     | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | 251 |
+/// Nonce Bitmap:  | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | ... | 0 |
+/// Mask:          | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | ... | 1 |
+/// Bitwise OR  ____________________________________________________
+///
+/// Result:        | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 | ... | 1 |
+///
+/// In this example, nonces 2, 4, and 251 are invalidated (set to 1); nonces 0, 1, and 3 were
+/// already invalidated.
+///
+/// Features:
+///
+/// - **Revoking Nonces**: An external function to invalidate single or multiple nonces in a nonce
+/// space and an internal function that consumes a nonce represented in compact (nonce_space,
+/// bitpos) format. If a nonce is already consumed, it panics.
+///
+/// - **Querying availability of nonces**: Functions to determine if a given nonce is usable or not.
 #[starknet::component]
 pub mod UnorderedNoncesComponent {
     use permit2::interfaces::unordered_nonces::IUnorderedNonces;
-    use permit2::libraries::bitmap::{BitmapPackingTrait, BitmapTrait};
-    use starknet::ContractAddress;
+    use permit2::libraries::bitmap::{
+        BIT_POSITION_OVERFLOW, BitmapPackingTrait, BitmapTrait, MAX_BIT_MAP,
+    };
     use starknet::storage::{
         Map, StoragePathEntry, StoragePointerReadAccess, StoragePointerWriteAccess,
     };
+    use starknet::{ContractAddress, get_caller_address};
 
     /// ERRORS ///
     pub mod Error {
@@ -71,7 +75,7 @@ pub mod UnorderedNoncesComponent {
     /// STORAGE ///
     #[storage]
     pub struct Storage {
-        nonces_bitmap: Map<(ContractAddress, felt252), felt252>,
+        pub nonces_bitmap: Map<(ContractAddress, felt252), felt252>,
     }
 
     /// EVENTS ///
@@ -127,14 +131,17 @@ pub mod UnorderedNoncesComponent {
         fn invalidate_unordered_nonces(
             ref self: ComponentState<TContractState>, nonce_space: felt252, mask: felt252,
         ) {
-            let caller = starknet::get_caller_address();
-            let bitmap_storage = self.nonces_bitmap.entry((caller, nonce_space));
+            let owner = get_caller_address();
+            let bitmap_storage = self.nonces_bitmap.entry((owner, nonce_space));
             let bitmap = bitmap_storage.read();
             let mask_u256: u256 = mask.into();
+
+            assert(mask_u256 <= MAX_BIT_MAP, BIT_POSITION_OVERFLOW);
+
             let new_bitmap = (bitmap.into() | mask_u256).try_into().unwrap();
             bitmap_storage.write(new_bitmap);
 
-            self.emit(UnorderedNonceInvalidation { owner: caller, nonce_space, mask });
+            self.emit(UnorderedNonceInvalidation { owner, nonce_space, mask });
         }
     }
 

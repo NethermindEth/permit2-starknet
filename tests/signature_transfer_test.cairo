@@ -1,3 +1,4 @@
+use core::num::traits::Pow;
 use openzeppelin_token::erc20::ERC20Component;
 use openzeppelin_token::erc20::interface::IERC20DispatcherTrait;
 use openzeppelin_utils::cryptography::snip12::OffchainMessageHash;
@@ -5,7 +6,7 @@ use permit2::interfaces::signature_transfer::{
     ISignatureTransferDispatcherTrait, PermitBatchTransferFrom, PermitTransferFrom,
     SignatureTransferDetails, TokenPermissions,
 };
-use permit2::libraries::bitmap::BitmapPackingTrait;
+use permit2::libraries::bitmap::{BitmapPackingTrait, MASK_8, SHIFT_8};
 use permit2::mocks::mock_erc20::{IMintableDispatcher, IMintableDispatcherTrait};
 use permit2::mocks::mock_witness::{
     Beta, MockWitness, Zeta, _MOCK_WITNESS_TYPE_STRING, _WITNESS_TYPE_STRING_FULL,
@@ -150,7 +151,7 @@ fn test_permit_batch_transfer_from() {
 
 #[test]
 #[should_panic(expected: 'Nonce already invalidated')]
-fn test_should_panic_permit_transfer_from_invalid_nonce() {
+fn test_should_panic_permit_transfer_from_nonce_already_invalidated() {
     let setup = setup();
     let nonce = 0;
     let token_permission = TokenPermissions {
@@ -189,7 +190,7 @@ fn test_should_panic_permit_transfer_from_invalid_nonce() {
 
 #[test]
 #[should_panic(expected: 'Nonce already invalidated')]
-fn test_should_panic_permit_batch_transfer_from_invalid_nonce() {
+fn test_should_panic_permit_batch_transfer_from_nonce_already_invalidated() {
     let setup = setup();
     let nonce = 0;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
@@ -240,9 +241,19 @@ fn test_should_panic_permit_batch_transfer_from_invalid_nonce() {
 #[fuzzer]
 fn test_permit_transfer_from_random_nonce_and_amount(mut nonce: felt252, mut amount: u256) {
     let setup = setup();
+
+    // A nonce's nonce space & bit position (bitmaps) are constrained, this limits them to only
+    // valid bounds
+    let nonce_u256: u256 = nonce.into();
+    let _nonce_space = (nonce_u256 / SHIFT_8) % (2_u256.pow(243));
+    let _bit_pos = (nonce_u256 & MASK_8) % 251;
+    nonce = ((_nonce_space * SHIFT_8) + _bit_pos).try_into().unwrap();
+
     let (nonce_space, bit_pos) = BitmapPackingTrait::unpack_nonce(nonce);
+
     // Limit nonce to only valid bit_pos's
-    nonce = BitmapPackingTrait::pack_nonce(nonce_space, bit_pos % 251);
+    nonce = BitmapPackingTrait::pack_nonce(nonce_space, bit_pos);
+
     // Limit amount to <= 1000 * E18
     //amount = amount % (99 * E18);
     let token_permission = TokenPermissions { token: setup.token0.contract_address, amount };
@@ -290,7 +301,16 @@ fn test_permit_transfer_from_random_nonce_and_amount(mut nonce: felt252, mut amo
 #[fuzzer]
 fn test_permit_transfer_spend_less_than_full(mut nonce: felt252, amount: u256) {
     let setup = setup();
+
+    // A nonce's nonce space & bit position (bitmaps) are constrained, this limits them to only
+    // valid bounds
+    let nonce_u256: u256 = nonce.into();
+    let _nonce_space = (nonce_u256 / SHIFT_8) % (2_u256.pow(243));
+    let _bit_pos = (nonce_u256 & MASK_8) % 251;
+    nonce = ((_nonce_space * SHIFT_8) + _bit_pos).try_into().unwrap();
+
     let (nonce_space, bit_pos) = BitmapPackingTrait::unpack_nonce(nonce);
+
     nonce = BitmapPackingTrait::pack_nonce(nonce_space, bit_pos % 251);
     let amount_to_spend = amount / 2;
     let token_permission = TokenPermissions { token: setup.token0.contract_address, amount };

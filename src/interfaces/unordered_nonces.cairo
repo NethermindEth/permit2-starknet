@@ -9,7 +9,7 @@ pub trait IUnorderedNonces<TState> {
     ///
     /// Uses unordered nonces so that permit messages do not need to be spent in a certain order
     ///
-    /// The nonce_space, or wordPosition is capped at type(uint244).max
+    /// The nonce_space is capped at uint243::max
     ///
     /// Parameters:
     ///
