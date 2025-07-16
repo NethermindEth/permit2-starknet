@@ -10,8 +10,9 @@ Cairo implementation of Uniswap Labs's Permit2 contract. Original codebase [here
 
 From the root directory, run:
 
-```bash scarb test
+```bash
 
+scarb test
 ```
 
 ## Deploy
