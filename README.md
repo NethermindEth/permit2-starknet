@@ -23,9 +23,10 @@ scarb test
 
 ### Setup
 
-1. Move to the [scripts/](./scripts/) directory.
+1. Move to the [scripts/](./scripts) directory.
 
 ```bash
+
 cd scripts
 ```
 
