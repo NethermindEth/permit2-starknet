@@ -23,14 +23,14 @@ scarb test
 
 ### Setup
 
-1. Move to the [scripts/](./scripts) directory.
+1. Move to the [scripts](./scripts/) directory.
 
 ```bash
 
 cd scripts
 ```
 
-2. Copy [`.env.example`](./.env.example) to `.env` and fill in the required values.
+2. Copy [`.env.example`](./scripts/.env.example) to `.env` and fill in the required values.
 
 3) Copy [`deployer_account.example.json`](./scripts/accounts/deployer_account.example.json) to `deployer_account.json` and fill in your account values.
 
