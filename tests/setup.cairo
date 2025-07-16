@@ -10,12 +10,11 @@ use snforge_std::{
 };
 use starknet::ContractAddress;
 use crate::common::{
-    Account, E18, create_erc20_token, create_larger_ds_token, create_mock_non_permit_token,
-    create_mock_permit2_lib, create_mock_permit_token, create_small_ds_token, generate_account,
+    Account, E18, create_erc20_token, create_mock_non_permit_token, create_mock_permit2_lib,
+    create_mock_permit_token, generate_account,
 };
 use crate::mocks::interfaces::{
     IMintableDispatcher, IMintableDispatcherTrait, IMockNonPermitTokenDispatcher,
-    IPermitWithDSDispatcher,
 };
 use crate::mocks::mock_permit2_lib::IMockPermit2LibDispatcher;
 
@@ -46,14 +45,10 @@ pub struct SetupST {
 pub struct SetupPermit2Lib {
     pub this: ContractAddress,
     pub pk_owner: Account,
-    pub to: Account,
-    pub bystander: ContractAddress,
     pub permit2: ISignatureTransferDispatcher,
     pub permit2_lib: IMockPermit2LibDispatcher,
     pub token: IERC20PermitDispatcher,
     pub non_permit_token: IMockNonPermitTokenDispatcher,
-    pub small_ds_token: IPermitWithDSDispatcher,
-    pub larger_ds_token: IPermitWithDSDispatcher,
     pub fallback_token: IERC20PermitDispatcher,
 }
 
@@ -81,14 +76,12 @@ pub fn setup_permit2_lib() -> SetupPermit2Lib {
     let permit2_ = ISignatureTransferDispatcher { contract_address: permit2_address };
 
     // Create accounts
-    let (pk_owner, to, _, bystander) = create_accounts();
+    let (pk_owner, _, _, _) = create_accounts();
     let this = starknet::get_contract_address();
 
     // Deploy tokens
     let token = create_mock_permit_token("Mock Token", "MOCK");
     let non_permit_token = create_mock_non_permit_token("Mock Non-Permit Token", "MOCK");
-    let small_ds_token = create_small_ds_token("Small DS Token", "SDS");
-    let larger_ds_token = create_larger_ds_token("Larger DS Token", "LDS");
     let permit2_lib = create_mock_permit2_lib(permit2_address);
     let fallback_token = create_mock_permit_token("Fallback Token", "MOCK");
 
@@ -96,17 +89,8 @@ pub fn setup_permit2_lib() -> SetupPermit2Lib {
     approve_max(token.contract_address, this, this);
     approve_max(token.contract_address, this, permit2_address);
 
-    mint(small_ds_token.contract_address, this, 1000 * E18);
-    approve_max(small_ds_token.contract_address, this, this);
-    approve_max(small_ds_token.contract_address, this, permit2_address);
-
     mint(token.contract_address, pk_owner.account.contract_address, 1000 * E18);
     approve_max(token.contract_address, pk_owner.account.contract_address, permit2_address);
-
-    mint(small_ds_token.contract_address, pk_owner.account.contract_address, 1000 * E18);
-    approve_max(
-        small_ds_token.contract_address, pk_owner.account.contract_address, permit2_address,
-    );
 
     mint(fallback_token.contract_address, this, 1000 * E18);
     approve_max(fallback_token.contract_address, this, this);
@@ -127,17 +111,7 @@ pub fn setup_permit2_lib() -> SetupPermit2Lib {
     );
 
     SetupPermit2Lib {
-        pk_owner,
-        this,
-        to,
-        bystander,
-        permit2: permit2_,
-        permit2_lib,
-        token,
-        non_permit_token,
-        small_ds_token,
-        larger_ds_token,
-        fallback_token,
+        pk_owner, this, permit2: permit2_, permit2_lib, token, non_permit_token, fallback_token,
     }
 }
 

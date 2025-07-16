@@ -429,9 +429,6 @@ pub mod old_permits {
     };
     use openzeppelin_token::erc20::snip12_utils::permit::Permit;
     use openzeppelin_utils::cryptography::snip12::OffchainMessageHash;
-    use permit2::interfaces::allowance_transfer::{
-        IAllowanceTransferDispatcher, IAllowanceTransferDispatcherTrait,
-    };
     use permit2::libraries::permit2_lib::Permit2Lib;
     use permit2::snip12_utils::permits::{
         PermitBatchStructHash, PermitBatchTransferFromStructHash,

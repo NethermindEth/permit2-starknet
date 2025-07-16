@@ -19,6 +19,5 @@ pub mod mocks {
     pub mod mock_non_permit_token;
     pub mod mock_permit2;
     pub mod mock_permit2_lib;
-    pub mod mock_permit_with_ds;
     pub mod mock_witness;
 }
