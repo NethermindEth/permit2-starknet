@@ -70,7 +70,6 @@ mod felt_bitmap_test {
     }
 }
 
-
 /// The `BitmapPackingTrait` trait provides an interface for packing and unpacking
 /// nonces into a bitmap representation. It allows for extracting the nonce space
 /// and bit position from a nonce, and packing a nonce space and bit position back
@@ -80,28 +79,33 @@ mod felt_bitmap_test {
 /// |                     8 bits for nonce position   |    243 bits for nonce space
 /// |  Bit Index:     | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | ... | 250 |
 /// |  Packed Nonce:  | 0 | 1 |  0 | 0 | 0 | ...  | 0 | 0 | 1 | 1 | 1 |
+/// +----------------------------------------------------------------------------------+
+///
+/// Valid nonce spaces are: [0, 2^243), i.e [0,1,2,...,2^243 - 1]
+///
+/// Valid indices are: [0, 251), i.e [0,1,2,...,250]
 pub trait BitmapPackingTrait<T> {
     fn unpack_nonce(nonce: T) -> (T, u8);
-    fn pack_nonce(nonce_space: T, bit_pos: u8) -> T;
+    fn pack_nonce(nonce_space: T, index: u8) -> T;
 }
 
 pub impl FeltBitmapPackingTraitImpl of BitmapPackingTrait<felt252> {
-    fn pack_nonce(nonce_space: felt252, bit_pos: u8) -> felt252 {
-        assert(bit_pos < 251, BIT_POSITION_OVERFLOW);
+    fn pack_nonce(nonce_space: felt252, index: u8) -> felt252 {
+        assert(index < 251, BIT_POSITION_OVERFLOW);
         assert(nonce_space.into() <= MAX_NONCE_SPACE, NONCE_SPACE_OVERFLOW);
 
-        ((nonce_space.into() * SHIFT_8) + bit_pos.into()).try_into().unwrap()
+        ((nonce_space.into() * SHIFT_8) + index.into()).try_into().unwrap()
     }
 
     fn unpack_nonce(nonce: felt252) -> (felt252, u8) {
         let nonce: u256 = nonce.into();
-        let bit_pos = nonce & MASK_8;
+        let index = nonce & MASK_8;
         let nonce_space = nonce / SHIFT_8;
 
-        assert(bit_pos < 251, BIT_POSITION_OVERFLOW);
+        assert(index < 251, BIT_POSITION_OVERFLOW);
         assert(nonce_space <= MAX_NONCE_SPACE, NONCE_SPACE_OVERFLOW);
 
-        (nonce_space.try_into().unwrap(), bit_pos.try_into().unwrap())
+        (nonce_space.try_into().unwrap(), index.try_into().unwrap())
     }
 }
 

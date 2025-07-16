@@ -42,7 +42,6 @@ pub impl AllowanceImpl of AllowanceTrait {
         ref self: StoragePath<Mutable<Allowance>>, amount: u256, expiration: u64, nonce: u64,
     ) {
         let stored_nonce = nonce + 1;
-
         let stored_expiration = if expiration == Self::BLOCK_TIMESTAMP_EXPIRATION {
             starknet::get_block_timestamp()
         } else {
@@ -56,14 +55,13 @@ pub impl AllowanceImpl of AllowanceTrait {
         ref self: StoragePath<Mutable<Allowance>>, amount: u256, expiration: u64,
     ) {
         let mut allowance = self.read();
-        allowance
-            .expiration =
-                if expiration == Self::BLOCK_TIMESTAMP_EXPIRATION {
-                    starknet::get_block_timestamp()
-                } else {
-                    expiration
-                };
+        let stored_expiration = if expiration == Self::BLOCK_TIMESTAMP_EXPIRATION {
+            starknet::get_block_timestamp()
+        } else {
+            expiration
+        };
 
+        allowance.expiration = stored_expiration;
         allowance.amount = amount;
         self.write(allowance);
     }

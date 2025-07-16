@@ -1,60 +1,3 @@
-/// The `UnorderedNoncesComponent` is designed for concurrent usage of nonces.
-///
-/// Nonces are represented in this component as a mapping from an owner and nonce space to a bitmap
-/// of 251 nonces. Each nonce space corresponds to a unique identifier, and the bitmap efficiently
-/// tracks the status of each nonce within that space.
-///
-/// Each bit in the bitmap represents a nonce, where a value of 1 indicates that the nonce is
-/// invalidated, and a value of 0 indicates that it is usable. Even though this bitmap is
-/// represented as a `felt252`, it can only represent 251 nonces (bits). This is because the maximum
-/// value of a felt252 is less than the maximum value of an unsigned integer of size 252 (max u252 =
-/// 2^252 - 1, max felt252 = 2^251 + 17 * 2^192).
-///
-/// Each nonce is identified by its `nonce space` and `bit position`. For more efficient
-/// serialization, information can be compactly packed into a single felt as follows:
-///   1. The lower 8 bits (bit_pos) → Represents the index (0 to 250).
-///   2. The remaining 244 bits     → Represents the unique nonce space.
-///
-/// In storage, the nonce is a `Map<(ContractAddress, felt252), felt252>`. This map maps (owner,
-/// nonce_space) to a bitmap representing 251 nonces, explained as follows:
-///
-/// Example nonce: 904625697166532776746648320380374280103671755200316906558262375061821325323
-///
-/// Nonce as binary: 0b001000...0001011 (252 bits)
-///
-/// Packed Nonce Representation:
-///         | (First 8 bits)|     (Last 244 bits )          |
-///         <-bit position->|<---------nonce space---------->
-/// Bitmap: |1|1|0|1|0|0|0|0|0|0|0|0|0|0|...| 0 | 1 | 0 | 0 |
-/// Index:  |0|1|2|3|4|5|6|7|8|    ...      |249|250|251|252|
-///
-/// In this example, the upper 244 bits represent the nonce space (0b0100...0000). The
-/// lower 8 bits (0b00001011) mean that the nonces 0, 1, and 3 in this nonce space are
-/// invalidated (set to 1). This nonce would be stored as Map(owner, 0b010...000) = 0b1011.
-///
-/// The packed nonce format allows for the representation of up to 251 nonces in a single felt252
-/// slot, enabling the invalidation of multiple nonces at once. This is particularly useful for
-/// batch operations where several nonces need to be revoked simultaneously.
-///
-/// Nonce invalidation:
-///
-/// Bit Index:     | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | 251 |
-/// Nonce Bitmap:  | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | ... | 0 |
-/// Mask:          | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | ... | 1 |
-/// Bitwise OR  ____________________________________________________
-///
-/// Result:        | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 | ... | 1 |
-///
-/// In this example, nonces 2, 4, and 251 are invalidated (set to 1); nonces 0, 1, and 3 were
-/// already invalidated.
-///
-/// Features:
-///
-/// - **Revoking Nonces**: An external function to invalidate single or multiple nonces in a nonce
-/// space and an internal function that consumes a nonce represented in compact (nonce_space,
-/// bitpos) format. If a nonce is already consumed, it panics.
-///
-/// - **Querying availability of nonces**: Functions to determine if a given nonce is usable or not.
 #[starknet::component]
 pub mod UnorderedNoncesComponent {
     use permit2::interfaces::unordered_nonces::IUnorderedNonces;
@@ -172,4 +115,55 @@ pub mod UnorderedNoncesComponent {
         }
     }
 }
+/// The `UnorderedNoncesComponent` is designed for concurrent usage of nonces.
+///
+/// Nonces are represented in this component as a mapping from an owner and nonce space to a bitmap
+/// of 251 nonces. Each nonce space corresponds to a unique identifier, and the bitmap efficiently
+/// tracks the status of each nonce within that space.
+///
+/// Each bit in the bitmap represents a nonce, where a value of 1 indicates that the nonce is
+/// invalidated, and a value of 0 indicates that it is usable.
+///
+/// Note: Even though this bitmap is represented as a `felt252`, it can only represent 251 nonces
+/// (bits). This is because the maximum value of a felt252 is less than the maximum value of an
+/// unsigned integer of size 252 (max u252 =2^252 - 1, max felt252 = 2^251 + 17 * 2^192).
+///
+/// Each nonce is identified by its `nonce space` and `bit position`. For more efficient
+/// serialization, information can be compactly packed into a single felt as follows:
+///   1. The lower 8 bits (index) → Represents the index [0 to 250].
+///   2. The remaining 244 bits     → Represents the unique nonce space [0, ..., 2^243 - 1].
+///
+/// In storage, the nonce is a `Map<(ContractAddress, felt252), felt252>`. This Map maps (owner,
+/// nonce_space) to a bitmap representing 251 nonces, explained as follows:
+///
+/// Example nonce: 904625697166532776746648320380374280103671755200316906558262375061821325323
+///
+/// Nonce as binary: 0b01000...0001011 (251 bits)
+///
+/// Packed Nonce Representation (binary):
+///         | (First 8 bits)|     (Last 243 bits )          |
+///         <-bit position->|<---------nonce space---------->
+/// Packed: |1|1|0|1|0|0|0|0|0|0|0|0|0|0|...| 0 | 0 | 1 | 0 |
+/// Index:  |0|1|2|3|4|5|6|7|8|    ...      |247|248|249|250|
+///
+/// In this example, the upper 243 bits represent the nonce space (0b0100...0000). The
+/// lower 8 bits (0b00001011) mean that the nonces 0, 1, and 3 in this nonce space are
+/// invalidated (set to 1). This nonce would be stored as Map(owner, 0b010...000) = 0b1011.
+///
+/// The packed nonce format allows for the representation of up to 251 nonces in a single felt252
+/// slot, enabling the invalidation of multiple nonces at once. This is particularly useful for
+/// batch operations where several nonces need to be revoked simultaneously.
+///
+/// Nonce invalidation:
+///
+/// Bit Index:     | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | 250 |
+/// Nonce Bitmap:  | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | ... | 0 |
+/// Mask:          | 1 | 0 | 1 | 0 | 1 | 1 | 0 | 0 | ... | 1 |
+/// Bitwise OR  ____________________________________________________
+///
+/// Result:        | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 | ... | 1 |
+///
+/// In this example, nonces 2, 4, 5 and 251 are invalidated (set to 1); nonces 0, 1, and 3 were
+/// already invalidated.
+
 

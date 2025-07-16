@@ -79,7 +79,6 @@ pub mod AllowanceTransferComponent {
         pub token: ContractAddress,
         #[key]
         pub spender: ContractAddress,
-        /// NOTE: uint160 in sol
         pub amount: u256,
         pub expiration: u64,
         pub nonce: u64,

@@ -145,8 +145,6 @@ pub mod SignatureTransferComponent {
             assert(is_valid == starknet::VALIDATED, Errors::INVALID_SIGNATURE);
 
             // Transfer tokens
-            /// TODO: Assert return value
-            // @dev: Needed ? Dispatcher should fail if transfer fails ?
             IERC20Dispatcher { contract_address: permit.permitted.token }
                 .transfer_from(owner, transfer_details.to, requested_amount);
         }
@@ -185,8 +183,6 @@ pub mod SignatureTransferComponent {
 
                 // Transfer tokens
                 if requested_amount > 0 {
-                    /// TODO: Assert return value
-                    // @dev: Needed ? Dispatcher should fail if transfer fails ?
                     IERC20Dispatcher { contract_address: *permitted.token }
                         .transfer_from(owner, *transfer_detail.to, requested_amount);
                 }
