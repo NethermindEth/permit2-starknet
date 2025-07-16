@@ -44,5 +44,6 @@ echo
 CONTRACT_ADDRESS=$(starkli deploy "$CLASS_HASH" --watch | grep -o '0x[a-fA-F0-9]\{64\}' | head -1)
 echo "[$CONTRACT_NAME] Contract deployed at: $CONTRACT_ADDRESS"
 
-echo "$CONTRACT_NAME address: $CONTRACT_ADDRESS" >permit2_address.env
-echo "Deployment address saved to permit2_address.env: $CONTRACT_ADDRESS"
+# Save deployment details to latest_deployment.txt
+echo -e "$CONTRACT_NAME address: $CONTRACT_ADDRESS\n\n$CONTRACT_NAME class hash: $CLASS_HASH" >latest_deployment.txt
+echo -e "Deployment address & class hash saved to latest_deployment.txt\n$CONTRACT_NAME address: $CONTRACT_ADDRESS\n$CONTRACT_NAME class hash: $CLASS_HASH"
