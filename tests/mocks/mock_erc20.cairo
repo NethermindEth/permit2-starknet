@@ -2,7 +2,7 @@
 pub mod MockERC20 {
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::ContractAddress;
-    use crate::mocks::common::IMintable;
+    use crate::mocks::interfaces::IMintable;
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 

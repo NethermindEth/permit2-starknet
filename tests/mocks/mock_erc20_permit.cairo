@@ -4,7 +4,7 @@ pub mod MockERC20Permit {
     use openzeppelin_utils::cryptography::nonces::NoncesComponent;
     use openzeppelin_utils::cryptography::snip12::SNIP12Metadata;
     use starknet::ContractAddress;
-    use crate::mocks::common::IMintable;
+    use crate::mocks::interfaces::IMintable;
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
     component!(path: NoncesComponent, storage: nonces, event: NoncesEvent);

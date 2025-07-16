@@ -13,7 +13,7 @@ pub mod permit2_lib_test;
 pub mod snip12_test;
 
 pub mod mocks {
-    pub mod common;
+    pub mod interfaces;
     pub mod mock_account;
     pub mod mock_erc20;
     pub mod mock_erc20_permit;

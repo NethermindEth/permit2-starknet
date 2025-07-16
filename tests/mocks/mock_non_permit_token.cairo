@@ -2,7 +2,7 @@
 pub mod MockNonPermitToken {
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::ContractAddress;
-    use crate::mocks::common::IMockNonPermitToken;
+    use crate::mocks::interfaces::IMockNonPermitToken;
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 

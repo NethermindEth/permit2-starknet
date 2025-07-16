@@ -22,7 +22,7 @@ use snforge_std::{
 };
 use starknet::get_block_timestamp;
 use crate::common::E18;
-use crate::mocks::common::{IMintableDispatcher, IMintableDispatcherTrait};
+use crate::mocks::interfaces::{IMintableDispatcher, IMintableDispatcherTrait};
 use crate::mocks::mock_witness::{
     Beta, MockWitness, Zeta, _MOCK_WITNESS_TYPE_STRING, _WITNESS_TYPE_STRING_FULL,
 };
