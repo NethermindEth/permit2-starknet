@@ -1,6 +1,28 @@
 export const ABI = [
   {
     "type": "impl",
+    "name": "Permit2",
+    "interface_name": "permit2::interfaces::permit2::IPermit2"
+  },
+  {
+    "type": "interface",
+    "name": "permit2::interfaces::permit2::IPermit2",
+    "items": [
+      {
+        "type": "function",
+        "name": "DOMAIN_SEPARATOR",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::felt252"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "impl",
     "name": "AllowedTransferImpl",
     "interface_name": "permit2::interfaces::allowance_transfer::IAllowanceTransfer"
   },
