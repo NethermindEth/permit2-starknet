@@ -1,12 +1,10 @@
-# Scripts
+# Deployment
 
-## Deployment
+## Requirements
 
-### Requirements
+- [starkli](https://github.com/xJonathanLEI/starkli)
 
-- [starkli (0.4.1)](https://github.com/xJonathanLEI/starkli)
-
-### Setup
+## Setup
 
 1. Move to this directory.
 
@@ -18,10 +16,27 @@ cd scripts
 
 3) Copy [`deployer_account.example.json`](./accounts/deployer_account.example.json) to `deployer_account.json` and fill in your account values.
 
-### Run the script:
+## Run the script:
 
 ```bash
 bash deploy_contract.sh
 ```
 
 The latest deployment address and class hash will be saved to [`latest_deployment.txt`](./latest_deployment.txt).
+
+# Generate ABI
+
+## Requirements
+
+- [scarb](https://docs.swmansion.com/scarb/)
+- [abi-wan-kanabi](https://www.npmjs.com/package/abi-wan-kanabi)
+
+## Generate ABI (for Typescript)
+
+From this directory, run:
+
+```bash
+bash generate_abi.sh
+```
+
+The generated ABI will be saved to [`permit2.ts`](../abi/permit2.ts).

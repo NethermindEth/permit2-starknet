@@ -22,6 +22,14 @@ export STARKNET_RPC
 export STARKNET_ACCOUNT
 export STARKNET_PRIVATE_KEY
 
+# Declare contract
+echo
+echo "=========================="
+echo "Running scarb build..."
+echo "=========================="
+echo
+cd .. && scarb build && cd scripts
+
 # Paths
 CONTRACT_NAME="Permit2"
 CONTRACT_JSON="../target/dev/permit2_${CONTRACT_NAME}.contract_class.json"
