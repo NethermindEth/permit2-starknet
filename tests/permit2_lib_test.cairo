@@ -18,12 +18,10 @@ pub impl AsAddressImpl of AsAddressTrait {
 
 #[cfg(test)]
 pub mod new_permits {
-    use core::hash::{HashStateExTrait, HashStateTrait};
     use core::num::traits::Bounded;
-    use core::poseidon::PoseidonTrait;
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use openzeppelin_utils::cryptography::snip12::{
-        OffchainMessageHash, SNIP12HashSpanImpl, SNIP12Metadata, StarknetDomain, StructHash,
+        OffchainMessageHash, SNIP12HashSpanImpl, StarknetDomain,
     };
     use permit2::interfaces::allowance_transfer::{
         IAllowanceTransferDispatcher, IAllowanceTransferDispatcherTrait, PermitDetails,
@@ -50,7 +48,7 @@ pub mod new_permits {
 
     pub const cafe: ContractAddress = 0xcafe.as_address();
 
-    fn setup() -> SetupPermit2Lib {
+    pub fn setup() -> SetupPermit2Lib {
         let _setup = setup_permit2_lib();
         test_permit2_full(_setup);
         test_permit2_non_permit_fall_back(_setup);
@@ -283,27 +281,6 @@ pub mod new_permits {
     }
 
     #[test]
-    fn test_transfer_from2_fallback() {
-        let setup = setup();
-
-        start_cheat_caller_address(
-            setup.permit2.contract_address, setup.pk_owner.account.contract_address,
-        );
-        Permit2Lib::transfer_from2(
-            setup.fallback_token.contract_address,
-            setup.pk_owner.account.contract_address,
-            0xb00b.as_address(),
-            1 * E18,
-            setup.permit2.contract_address,
-        );
-        stop_cheat_caller_address(setup.permit2.contract_address);
-    }
-
-    // move to bottom mod
-    #[test]
-    fn test_permit2_plus_transfer_from2() {}
-
-    #[test]
     fn test_permit2_plus_transfer_from2_with_non_permit() {
         let setup = setup();
         let (_, _, nonce) = IAllowanceTransferDispatcher {
@@ -339,11 +316,12 @@ pub mod new_permits {
             signature,
             setup.permit2.contract_address,
         );
+
         Permit2Lib::transfer_from2(
             setup.non_permit_token.contract_address,
             setup.pk_owner.account.contract_address,
             0xb00b.as_address(),
-            E18,
+            1,
             setup.permit2.contract_address,
         );
         stop_cheat_caller_address(setup.permit2.contract_address);
@@ -445,10 +423,15 @@ pub mod new_permits {
 
 #[cfg(test)]
 pub mod old_permits {
-    use core::num::traits::Bounded;
-    use openzeppelin_token::erc20::interface::{IERC20PermitDispatcher, IERC20PermitDispatcherTrait};
+    use openzeppelin_token::erc20::interface::{
+        IERC20Dispatcher, IERC20DispatcherTrait, IERC20PermitDispatcher,
+        IERC20PermitDispatcherTrait,
+    };
     use openzeppelin_token::erc20::snip12_utils::permit::Permit;
     use openzeppelin_utils::cryptography::snip12::OffchainMessageHash;
+    use permit2::interfaces::allowance_transfer::{
+        IAllowanceTransferDispatcher, IAllowanceTransferDispatcherTrait,
+    };
     use permit2::libraries::permit2_lib::Permit2Lib;
     use permit2::snip12_utils::permits::{
         PermitBatchStructHash, PermitBatchTransferFromStructHash,
@@ -460,18 +443,20 @@ pub mod old_permits {
     use snforge_std::signature::stark_curve::{
         StarkCurveKeyPairImpl, StarkCurveSignerImpl, StarkCurveVerifierImpl,
     };
+    use snforge_std::{start_cheat_caller_address, stop_cheat_caller_address};
     use starknet::{ContractAddress, get_block_timestamp};
     use crate::common::E18;
     use crate::mocks::mock_erc20_permit::MockERC20Permit::SNIP12MetadataImpl;
-    use crate::setup::{SetupPermit2Lib, setup_permit2_lib as setup};
+    use crate::setup::SetupPermit2Lib;
     use super::AsAddressImpl;
+    use super::new_permits::setup;
 
     pub const amount: u256 = 1 * E18;
     const bob: ContractAddress = 0xb00b.as_address();
 
     pub fn test_standard_permit(setup: SetupPermit2Lib) {
-        let n = IERC20PermitDispatcher { contract_address: setup.token.contract_address };
-        let nonce = n.nonces(setup.pk_owner.account.contract_address);
+        let nonce = IERC20PermitDispatcher { contract_address: setup.token.contract_address }
+            .nonces(setup.pk_owner.account.contract_address);
 
         // Create permit(1) and sign it
         let permit = Permit {
@@ -494,12 +479,18 @@ pub mod old_permits {
                 get_block_timestamp().into(),
                 signature.span(),
             );
+
+        let allowance = IERC20Dispatcher { contract_address: setup.token.contract_address }
+            .allowance(setup.pk_owner.account.contract_address, bob);
+
+        assert_eq!(allowance, E18);
     }
 
     #[test]
     fn test_permit2() {
         let setup = setup();
-        let nonce = 0;
+        let nonce = IERC20PermitDispatcher { contract_address: setup.token.contract_address }
+            .nonces(setup.pk_owner.account.contract_address);
 
         // Create permit(1) and sign it
         let permit = Permit {
@@ -527,13 +518,14 @@ pub mod old_permits {
     #[test]
     fn test_permit2_small_ds_no_revert() {
         let setup = setup();
-        let nonce = 0;
+        let nonce = IERC20PermitDispatcher { contract_address: setup.token.contract_address }
+            .nonces(setup.pk_owner.account.contract_address);
 
         // Create permit(1) and sign it
         let permit = Permit {
             token: setup.token.contract_address,
             spender: bob,
-            amount: 1 * E18,
+            amount: E18,
             nonce: nonce,
             deadline: get_block_timestamp().into(),
         };
@@ -546,10 +538,48 @@ pub mod old_permits {
             .permit(
                 setup.pk_owner.account.contract_address,
                 bob,
-                amount,
+                E18,
                 get_block_timestamp().into(),
                 signature.span(),
             );
+    }
+
+    #[test]
+    fn test_permit2_plus_transfer_from2() {
+        let setup = setup();
+        let nonce = IERC20PermitDispatcher { contract_address: setup.token.contract_address }
+            .nonces(setup.pk_owner.account.contract_address);
+
+        // Create permit(1) and sign it
+        let permit = Permit {
+            token: setup.token.contract_address,
+            spender: bob,
+            amount: E18,
+            nonce,
+            deadline: get_block_timestamp().into(),
+        };
+        let permit_msg = permit.get_message_hash(setup.pk_owner.account.contract_address);
+        let (r, s) = setup.pk_owner.key_pair.sign(permit_msg).unwrap();
+        let signature = array![r, s];
+
+        start_cheat_caller_address(setup.token.contract_address, bob);
+        Permit2Lib::permit2(
+            setup.token.contract_address,
+            setup.pk_owner.account.contract_address,
+            bob,
+            E18,
+            get_block_timestamp().into(),
+            signature,
+            setup.permit2.contract_address,
+        );
+        Permit2Lib::transfer_from2(
+            setup.token.contract_address,
+            setup.pk_owner.account.contract_address,
+            bob,
+            1,
+            setup.permit2.contract_address,
+        );
+        stop_cheat_caller_address(setup.token.contract_address);
     }
 }
 

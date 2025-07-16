@@ -248,6 +248,7 @@ pub mod AllowanceTransferComponent {
             if allowed.amount != Bounded::MAX {
                 allowed.amount -= amount;
             }
+
             allowance_storage.write(allowed);
 
             IERC20Dispatcher { contract_address: token }.transfer_from(from, to, amount);
