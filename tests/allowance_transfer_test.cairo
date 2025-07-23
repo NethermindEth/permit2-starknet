@@ -449,19 +449,21 @@ fn test_permit_batch_allowance_transfer_same_token() {
     assert_eq!(amount, DEFAULT_AMOUNT);
 
     // Batch transfer details (transfer token0 multiple times)
-    let transfer_details = (0..3_u8)
-        .into_iter()
-        .map(
-            |_x| {
+    let mut transfer_details: Array<AllowanceTransferDetails> = array![];
+    let mut i = 0_u8;
+    while i < 3 {
+        transfer_details
+            .append(
                 AllowanceTransferDetails {
                     from: setup.from.account.contract_address,
                     to: setup.to.account.contract_address,
                     amount: E18,
                     token: setup.token0.contract_address,
-                }
-            },
-        )
-        .collect::<Array<_>>();
+                },
+            );
+
+        i += 1;
+    }
 
     // Bystander transfers `E18` of `token0` from `from` to `to` multiple times
     start_cheat_caller_address(setup.permit2.contract_address, setup.bystander);
@@ -595,7 +597,7 @@ fn test_permit_batch_allowance_transfer_different_tokens() {
                     token: setup.token1.contract_address,
                 },
             );
-    }
+    };
 
     // Bystander transfers `E18` of `token0` & `token1` from `from` to `to` multiple times
     start_cheat_caller_address(setup.permit2.contract_address, setup.bystander);
@@ -1132,19 +1134,19 @@ fn test_batch_transfer_from_different_owners() {
     assert_eq!(amount1, DEFAULT_AMOUNT);
 
     let owners = array![setup.from.account.contract_address, setup.to.account.contract_address];
-    let transfer_details = owners
-        .into_iter()
-        .map(
-            |owner| {
+    let mut transfer_details = array![];
+    for owner in owners.span() {
+        transfer_details
+            .append(
                 AllowanceTransferDetails {
-                    from: owner,
+                    from: *owner,
                     to: setup.bystander,
                     amount: E18,
                     token: setup.token0.contract_address,
-                }
-            },
-        )
-        .collect::<Array<_>>();
+                },
+            );
+    };
+
     start_cheat_caller_address(setup.permit2.contract_address, setup.bystander);
     setup.permit2.batch_transfer_from(transfer_details.clone());
     stop_cheat_caller_address(setup.permit2.contract_address);
@@ -1237,23 +1239,22 @@ fn test_lockdown() {
     let default_expiration = get_block_timestamp() + 5;
 
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let details = tokens
-        .clone()
-        .into_iter()
-        .map(
-            |token| {
+
+    let mut details = array![];
+    for token in tokens.span() {
+        details
+            .append(
                 PermitDetails {
-                    token,
+                    token: *token,
                     amount: DEFAULT_AMOUNT,
                     expiration: default_expiration,
                     nonce: DEFAULT_NONCE,
-                }
-            },
-        )
-        .collect::<Array<_>>()
-        .span();
+                },
+            );
+    };
+
     let permit_batch = PermitBatch {
-        details, spender: setup.bystander, sig_deadline: default_expiration.into(),
+        details: details.span(), spender: setup.bystander, sig_deadline: default_expiration.into(),
     };
     let message_hash = permit_batch.get_message_hash(setup.from.account.contract_address);
     let (r, s) = setup.from.key_pair.sign(message_hash).unwrap();
@@ -1282,12 +1283,10 @@ fn test_lockdown() {
     assert_eq!(nonce1, 1);
 
     // Build token spender pairs
-    let approvals = tokens
-        .into_iter()
-        .map(|token| {
-            TokenSpenderPair { token, spender: setup.bystander }
-        })
-        .collect::<Array<_>>();
+    let mut approvals = array![];
+    for token in tokens.span() {
+        approvals.append(TokenSpenderPair { token: *token, spender: setup.bystander });
+    };
 
     let mut spy = spy_events();
 

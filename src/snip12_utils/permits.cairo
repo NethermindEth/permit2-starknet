@@ -65,16 +65,14 @@ pub impl PermitSingleStructHash of StructHash<PermitSingle> {
 
 pub impl PermitBatchStructHash of StructHash<PermitBatch> {
     fn hash_struct(self: @PermitBatch) -> felt252 {
-        let hashed_details = self
-            .details
-            .into_iter()
-            .map(|detail| detail.hash_struct())
-            .collect::<Array<felt252>>()
-            .span();
+        let mut hashed_details = array![];
+        for detail in *self.details {
+            hashed_details.append(detail.hash_struct());
+        };
 
         PoseidonTrait::new()
             .update_with(_PERMIT_BATCH_TYPE_HASH)
-            .update_with(hashed_details)
+            .update_with(hashed_details.span())
             .update_with(*self.spender)
             .update_with(self.sig_deadline.hash_struct())
             .finalize()
@@ -95,16 +93,14 @@ pub impl PermitTransferFromStructHash of StructHash<PermitTransferFrom> {
 
 pub impl PermitBatchTransferFromStructHash of StructHash<PermitBatchTransferFrom> {
     fn hash_struct(self: @PermitBatchTransferFrom) -> felt252 {
-        let hashed_permissions = self
-            .permitted
-            .into_iter()
-            .map(|permission| permission.hash_struct())
-            .collect::<Array<felt252>>()
-            .span();
+        let mut hashed_permissions = array![];
+        for permission in *self.permitted {
+            hashed_permissions.append(permission.hash_struct());
+        };
 
         PoseidonTrait::new()
             .update_with(_PERMIT_BATCH_TRANSFER_FROM_TYPE_HASH)
-            .update_with(hashed_permissions)
+            .update_with(hashed_permissions.span())
             .update_with(get_caller_address())
             .update_with(*self.nonce)
             .update_with(self.deadline.hash_struct())
@@ -161,16 +157,14 @@ pub impl PermitBatchTransferFromStructHashWitness of StructHashWitnessTrait<
     fn hash_with_witness(
         self: @PermitBatchTransferFrom, witness: felt252, witness_type_string: ByteArray,
     ) -> felt252 {
-        let hashed_permissions = self
-            .permitted
-            .into_iter()
-            .map(|permission| permission.hash_struct())
-            .collect::<Array<felt252>>()
-            .span();
+        let mut hashed_permissions = array![];
+        for permission in *self.permitted {
+            hashed_permissions.append(permission.hash_struct());
+        };
 
         PoseidonTrait::new()
             .update_with(_PERMIT_BATCH_WITNESS_TRANSFER_FROM_TYPE_HASH(witness_type_string))
-            .update_with(hashed_permissions)
+            .update_with(hashed_permissions.span())
             .update_with(get_caller_address())
             .update_with(*self.nonce)
             .update_with(self.deadline.hash_struct())
@@ -238,16 +232,14 @@ pub impl PermitBatchTransferFromOffChainMessageHashWitness<
             chain_id: get_tx_info().unbox().chain_id,
             revision: 1,
         };
-        let hashed_permissions = self
-            .permitted
-            .into_iter()
-            .map(|permission| permission.hash_struct())
-            .collect::<Array<felt252>>()
-            .span();
+        let mut hashed_permissions = array![];
+        for permission in *self.permitted {
+            hashed_permissions.append(permission.hash_struct());
+        };
 
         let hashed_permit = PoseidonTrait::new()
             .update_with(_PERMIT_BATCH_WITNESS_TRANSFER_FROM_TYPE_HASH(witness_type_string))
-            .update_with(hashed_permissions)
+            .update_with(hashed_permissions.span())
             .update_with(get_caller_address())
             .update_with(*self.nonce)
             .update_with(self.deadline.hash_struct())

@@ -176,17 +176,22 @@ pub mod SignatureTransferComponent {
             assert(is_valid == starknet::VALIDATED, Errors::INVALID_SIGNATURE);
 
             // Iterate over each permitted token and transfer detail
-            for (permitted, transfer_detail) in permit.permitted.into_iter().zip(transfer_details) {
+            let mut i = 0_usize;
+            while i != permit.permitted.len() {
+                let permitted = permit.permitted.get(i).unwrap();
+                let transfer_detail = transfer_details.get(i).unwrap();
                 // Validate requested amount <= permitted amount
-                let requested_amount = *transfer_detail.requested_amount;
-                assert(requested_amount <= *permitted.amount, 'InvalidAmount');
+                let requested_amount = transfer_detail.requested_amount;
+                assert(requested_amount <= permitted.amount, 'InvalidAmount');
 
                 // Transfer tokens
                 if requested_amount > 0 {
-                    IERC20Dispatcher { contract_address: *permitted.token }
-                        .transfer_from(owner, *transfer_detail.to, requested_amount);
+                    IERC20Dispatcher { contract_address: permitted.token }
+                        .transfer_from(owner, transfer_detail.to, requested_amount);
                 }
-            }
+
+                i += 1;
+            };
         }
     }
 }
