@@ -451,7 +451,7 @@ fn test_permit_batch_allowance_transfer_same_token() {
     // Batch transfer details (transfer token0 multiple times)
     let mut transfer_details: Array<AllowanceTransferDetails> = array![];
     let mut i = 0_u8;
-    while i < 3 {
+    while i != 3 {
         transfer_details
             .append(
                 AllowanceTransferDetails {
@@ -463,7 +463,7 @@ fn test_permit_batch_allowance_transfer_same_token() {
             );
 
         i += 1;
-    }
+    };
 
     // Bystander transfers `E18` of `token0` from `from` to `to` multiple times
     start_cheat_caller_address(setup.permit2.contract_address, setup.bystander);

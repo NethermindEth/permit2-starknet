@@ -98,7 +98,7 @@ fn test_permit_batch_transfer_from() {
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: 10 * E18 });
-    }
+    };
 
     let permit = PermitBatchTransferFrom {
         permitted: token_permissions.span(), nonce, deadline: (get_block_timestamp() + 100).into(),
@@ -196,7 +196,7 @@ fn test_should_panic_permit_batch_transfer_from_nonce_already_invalidated() {
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: 10 * E18 });
-    }
+    };
 
     let permit = PermitBatchTransferFrom {
         permitted: token_permissions.span(), nonce, deadline: (get_block_timestamp() + 100).into(),
@@ -361,7 +361,7 @@ fn test_permit_batch_tranfer_from_multi_permit_single_transfer() {
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
 
     let transfer_details = array![
         // Transfer 0 tokens
@@ -606,7 +606,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_should_panic() {
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
 
     let transfer_details = array![
         // Transfer 0 tokens
@@ -648,7 +648,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_length_should_panic() 
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -689,7 +689,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_length_should_panic2()
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -730,7 +730,7 @@ fn test_permit_batch_transfer_from_when_deadline_passed_should_panic() {
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -807,7 +807,7 @@ fn test_permit_batch_transfer_with_invalid_spender_should_panic() {
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -983,7 +983,7 @@ fn test_permit_batch_witness_transfer_with_invalid_spender_should_panic() {
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -1034,7 +1034,7 @@ fn test_permit_witness_batch_transfer_from_with_invalid_witness_should_panic() {
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -1086,7 +1086,7 @@ fn test_permit_witness_batch_transfer_from_with_invalid_witness_type_string_shou
     let mut token_permissions: Array<TokenPermissions> = array![];
     for token in tokens.span() {
         token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
-    }
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
