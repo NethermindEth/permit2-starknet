@@ -6,8 +6,8 @@ Cairo implementation of Uniswap Labs's Permit2 contract. Original codebase [here
 
 ### Requirements
 
-- [scarb >=2.11.4](https://docs.swmansion.com/scarb/)
-- [starknet-foundry >=0.45.0 ](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html)
+- [scarb =2.10.1](https://docs.swmansion.com/scarb/)
+- [starknet-foundry >=0.38.3 ](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html)
 
 From the root directory, run:
 
@@ -47,7 +47,7 @@ The latest deployment address and class hash will be saved to [`latest_deploymen
 
 ### Requirements
 
-- [scarb >=2.11.4](https://docs.swmansion.com/scarb/)
+- [scarb >=2.10.1](https://docs.swmansion.com/scarb/)
 - [abi-wan-kanabi >=2.2.4](https://www.npmjs.com/package/abi-wan-kanabi)
 
 ### Generate ABI (for Typescript)
