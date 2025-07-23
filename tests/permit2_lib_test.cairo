@@ -11,7 +11,8 @@ pub impl AsAddressImpl of AsAddressTrait {
     /// Requirements:
     ///
     /// - `value` must be a valid contract address.
-    const fn as_address(self: felt252) -> ContractAddress {
+    //const
+    fn as_address(self: felt252) -> ContractAddress {
         self.try_into().expect('Invalid contract address')
     }
 }
@@ -46,7 +47,10 @@ pub mod new_permits {
     use super::old_permits::test_standard_permit;
     use super::{AsAddressImpl, DEFAULT_AMOUNT};
 
-    pub const cafe: ContractAddress = 0xcafe.as_address();
+    pub fn cafe() -> ContractAddress {
+        0xcafe.as_address()
+    }
+    //pub const cafe: ContractAddress = 0xcafe.as_address();
 
     pub fn setup() -> SetupPermit2Lib {
         let _setup = setup_permit2_lib();
@@ -61,7 +65,9 @@ pub mod new_permits {
         let (_, _, nonce) = IAllowanceTransferDispatcher {
             contract_address: setup.permit2.contract_address,
         }
-            .allowance(setup.pk_owner.account.contract_address, setup.token.contract_address, cafe);
+            .allowance(
+                setup.pk_owner.account.contract_address, setup.token.contract_address, cafe(),
+            );
 
         // Create permit and sign it
         let permit = PermitSingle {
@@ -71,7 +77,7 @@ pub mod new_permits {
                 expiration: Bounded::<u64>::MAX,
                 nonce,
             },
-            spender: cafe,
+            spender: cafe(),
             sig_deadline: get_block_timestamp().into(),
         };
         let permit_msg = permit.get_message_hash(setup.pk_owner.account.contract_address);
@@ -81,7 +87,7 @@ pub mod new_permits {
         Permit2Lib::simple_permit2(
             setup.token.contract_address,
             setup.pk_owner.account.contract_address,
-            cafe,
+            cafe(),
             E18,
             get_block_timestamp().into(),
             signature,
@@ -96,7 +102,7 @@ pub mod new_permits {
             .allowance(
                 setup.pk_owner.account.contract_address,
                 setup.non_permit_token.contract_address,
-                cafe,
+                cafe(),
             );
 
         // Create permit and sign it
@@ -107,7 +113,7 @@ pub mod new_permits {
                 expiration: Bounded::<u64>::MAX,
                 nonce: nonce,
             },
-            spender: cafe,
+            spender: cafe(),
             sig_deadline: get_block_timestamp().into(),
         };
         let permit_msg = permit.get_message_hash(setup.pk_owner.account.contract_address);
@@ -117,7 +123,7 @@ pub mod new_permits {
         Permit2Lib::simple_permit2(
             setup.non_permit_token.contract_address,
             setup.pk_owner.account.contract_address,
-            cafe,
+            cafe(),
             E18,
             get_block_timestamp().into(),
             signature,
@@ -132,7 +138,7 @@ pub mod new_permits {
             .allowance(
                 setup.pk_owner.account.contract_address,
                 setup.fallback_token.contract_address,
-                cafe,
+                cafe(),
             );
 
         // Create permit and sign it
@@ -143,7 +149,7 @@ pub mod new_permits {
                 expiration: Bounded::<u64>::MAX,
                 nonce: nonce,
             },
-            spender: cafe,
+            spender: cafe(),
             sig_deadline: get_block_timestamp().into(),
         };
         let permit_msg = permit.get_message_hash(setup.pk_owner.account.contract_address);
@@ -153,7 +159,7 @@ pub mod new_permits {
         Permit2Lib::simple_permit2(
             setup.fallback_token.contract_address,
             setup.pk_owner.account.contract_address,
-            cafe,
+            cafe(),
             E18,
             get_block_timestamp().into(),
             signature,
@@ -176,7 +182,9 @@ pub mod new_permits {
         let (_, _, nonce) = IAllowanceTransferDispatcher {
             contract_address: setup.permit2.contract_address,
         }
-            .allowance(setup.pk_owner.account.contract_address, setup.token.contract_address, cafe);
+            .allowance(
+                setup.pk_owner.account.contract_address, setup.token.contract_address, cafe(),
+            );
 
         // Create permit and sign it
         let permit = PermitSingle {
@@ -186,7 +194,7 @@ pub mod new_permits {
                 expiration: Bounded::<u64>::MAX,
                 nonce,
             },
-            spender: cafe,
+            spender: cafe(),
             sig_deadline: get_block_timestamp().into(),
         };
         let permit_msg = permit.get_message_hash(setup.pk_owner.account.contract_address);
@@ -196,7 +204,7 @@ pub mod new_permits {
         Permit2Lib::simple_permit2(
             setup.token.contract_address,
             setup.pk_owner.account.contract_address,
-            cafe,
+            cafe(),
             E18,
             get_block_timestamp().into(),
             signature,
@@ -229,7 +237,7 @@ pub mod new_permits {
     //                expiration: Bounded::<u64>::MAX,
     //                nonce: nonce,
     //            },
-    //            spender: cafe,
+    //            spender: cafe(),
     //            sig_deadline: get_block_timestamp().into(),
     //        };
     //
@@ -254,7 +262,7 @@ pub mod new_permits {
     fn test_transfer_from2_full() {
         let setup = setup();
 
-        start_cheat_caller_address(setup.permit2.contract_address, cafe);
+        start_cheat_caller_address(setup.permit2.contract_address, cafe());
         Permit2Lib::transfer_from2(
             setup.token.contract_address,
             setup.pk_owner.account.contract_address,
@@ -269,7 +277,7 @@ pub mod new_permits {
     fn test_transfer_from2_non_permit_token() {
         let setup = setup();
 
-        start_cheat_caller_address(setup.permit2.contract_address, cafe);
+        start_cheat_caller_address(setup.permit2.contract_address, cafe());
         Permit2Lib::transfer_from2(
             setup.non_permit_token.contract_address,
             setup.pk_owner.account.contract_address,
@@ -289,7 +297,7 @@ pub mod new_permits {
             .allowance(
                 setup.pk_owner.account.contract_address,
                 setup.non_permit_token.contract_address,
-                cafe,
+                cafe(),
             );
 
         let permit = PermitSingle {
@@ -299,18 +307,18 @@ pub mod new_permits {
                 expiration: Bounded::<u64>::MAX,
                 nonce,
             },
-            spender: cafe,
+            spender: cafe(),
             sig_deadline: get_block_timestamp().into(),
         };
         let permit_msg = permit.get_message_hash(setup.pk_owner.account.contract_address);
         let (r, s) = setup.pk_owner.key_pair.sign(permit_msg).unwrap();
         let signature = array![r, s];
 
-        start_cheat_caller_address(setup.permit2.contract_address, cafe);
+        start_cheat_caller_address(setup.permit2.contract_address, cafe());
         Permit2Lib::permit2(
             setup.non_permit_token.contract_address,
             setup.pk_owner.account.contract_address,
-            cafe,
+            cafe(),
             E18,
             get_block_timestamp().into(),
             signature,
@@ -336,7 +344,7 @@ pub mod new_permits {
             .allowance(
                 setup.pk_owner.account.contract_address,
                 setup.fallback_token.contract_address,
-                cafe,
+                cafe(),
             );
 
         let permit = PermitSingle {
@@ -346,18 +354,18 @@ pub mod new_permits {
                 expiration: Bounded::<u64>::MAX,
                 nonce,
             },
-            spender: cafe,
+            spender: cafe(),
             sig_deadline: get_block_timestamp().into(),
         };
         let permit_msg = permit.get_message_hash(setup.pk_owner.account.contract_address);
         let (r, s) = setup.pk_owner.key_pair.sign(permit_msg).unwrap();
         let signature = array![r, s];
 
-        start_cheat_caller_address(setup.permit2.contract_address, cafe);
+        start_cheat_caller_address(setup.permit2.contract_address, cafe());
         Permit2Lib::permit2(
             setup.fallback_token.contract_address,
             setup.pk_owner.account.contract_address,
-            cafe,
+            cafe(),
             E18,
             get_block_timestamp().into(),
             signature,
@@ -382,7 +390,7 @@ pub mod new_permits {
             .allowance(
                 setup.pk_owner.account.contract_address,
                 setup.non_permit_token.contract_address,
-                cafe,
+                cafe(),
             );
 
         let permit = PermitSingle {
@@ -392,18 +400,18 @@ pub mod new_permits {
                 expiration: Bounded::<u64>::MAX,
                 nonce,
             },
-            spender: cafe,
+            spender: cafe(),
             sig_deadline: get_block_timestamp().into(),
         };
         let permit_msg = permit.get_message_hash(setup.pk_owner.account.contract_address);
         let (r, s) = setup.pk_owner.key_pair.sign(permit_msg).unwrap();
         let signature = array![r, s];
 
-        start_cheat_caller_address(setup.permit2.contract_address, cafe);
+        start_cheat_caller_address(setup.permit2.contract_address, cafe());
         Permit2Lib::simple_permit2(
             setup.non_permit_token.contract_address,
             setup.pk_owner.account.contract_address,
-            cafe,
+            cafe(),
             E18,
             get_block_timestamp().into(),
             signature,
@@ -448,8 +456,11 @@ pub mod old_permits {
     use super::AsAddressImpl;
     use super::new_permits::setup;
 
-    pub const amount: u256 = 1 * E18;
-    const bob: ContractAddress = 0xb00b.as_address();
+    pub const amount: u256 = E18;
+    pub fn bob() -> ContractAddress {
+        0xb00b.as_address()
+    }
+    // const bob: ContractAddress = 0xb00b.as_address();
 
     pub fn test_standard_permit(setup: SetupPermit2Lib) {
         let nonce = IERC20PermitDispatcher { contract_address: setup.token.contract_address }
@@ -458,7 +469,7 @@ pub mod old_permits {
         // Create permit(1) and sign it
         let permit = Permit {
             token: setup.token.contract_address,
-            spender: bob,
+            spender: bob(),
             amount: E18,
             nonce,
             deadline: get_block_timestamp().into(),
@@ -471,14 +482,14 @@ pub mod old_permits {
             .token
             .permit(
                 setup.pk_owner.account.contract_address,
-                bob,
+                bob(),
                 E18,
                 get_block_timestamp().into(),
                 signature.span(),
             );
 
         let allowance = IERC20Dispatcher { contract_address: setup.token.contract_address }
-            .allowance(setup.pk_owner.account.contract_address, bob);
+            .allowance(setup.pk_owner.account.contract_address, bob());
 
         assert_eq!(allowance, E18);
     }
@@ -492,7 +503,7 @@ pub mod old_permits {
         // Create permit(1) and sign it
         let permit = Permit {
             token: setup.token.contract_address,
-            spender: bob,
+            spender: bob(),
             amount: 1 * E18,
             nonce,
             deadline: get_block_timestamp().into(),
@@ -504,7 +515,7 @@ pub mod old_permits {
         Permit2Lib::permit2(
             setup.token.contract_address,
             setup.pk_owner.account.contract_address,
-            bob,
+            bob(),
             1 * E18,
             get_block_timestamp().into(),
             signature,
@@ -521,7 +532,7 @@ pub mod old_permits {
         // Create permit(1) and sign it
         let permit = Permit {
             token: setup.token.contract_address,
-            spender: bob,
+            spender: bob(),
             amount: E18,
             nonce: nonce,
             deadline: get_block_timestamp().into(),
@@ -534,7 +545,7 @@ pub mod old_permits {
             .token
             .permit(
                 setup.pk_owner.account.contract_address,
-                bob,
+                bob(),
                 E18,
                 get_block_timestamp().into(),
                 signature.span(),
@@ -550,7 +561,7 @@ pub mod old_permits {
         // Create permit(1) and sign it
         let permit = Permit {
             token: setup.token.contract_address,
-            spender: bob,
+            spender: bob(),
             amount: E18,
             nonce,
             deadline: get_block_timestamp().into(),
@@ -559,11 +570,11 @@ pub mod old_permits {
         let (r, s) = setup.pk_owner.key_pair.sign(permit_msg).unwrap();
         let signature = array![r, s];
 
-        start_cheat_caller_address(setup.token.contract_address, bob);
+        start_cheat_caller_address(setup.token.contract_address, bob());
         Permit2Lib::permit2(
             setup.token.contract_address,
             setup.pk_owner.account.contract_address,
-            bob,
+            bob(),
             E18,
             get_block_timestamp().into(),
             signature,
@@ -572,7 +583,7 @@ pub mod old_permits {
         Permit2Lib::transfer_from2(
             setup.token.contract_address,
             setup.pk_owner.account.contract_address,
-            bob,
+            bob(),
             1,
             setup.permit2.contract_address,
         );

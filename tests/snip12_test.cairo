@@ -127,11 +127,11 @@ fn test_permit_message_hash() {
     let permit_batch: PermitBatch = make_permit_batch();
 
     assert_eq!(
-        permit_single.get_message_hash(owner),
+        permit_single.get_message_hash(owner()),
         0x794214c8a8edd8fef718f76d1685bb3a4c83415ce370d69258ae5844b45ed6e,
     );
     assert_eq!(
-        permit_batch.get_message_hash(owner),
+        permit_batch.get_message_hash(owner()),
         0x5d5dbaa6d5a4cf5410b16839b34ec489fc590f4471c3c88b68ddcccc9174f73,
     );
 }
@@ -142,13 +142,13 @@ fn test_permit_transfer_from_message_hash() {
     let permit_batch_transfer_from: PermitBatchTransferFrom = make_permit_batch_transfer_from();
 
     // Caller is used as the spender field in these struct hashes
-    start_cheat_caller_address_global(spender);
+    start_cheat_caller_address_global(spender());
     assert_eq!(
-        permit_transfer_from.get_message_hash(owner),
+        permit_transfer_from.get_message_hash(owner()),
         0x39ed11b65172537ff8cba38d301efa0a49f02eb392b238a8cde5e33684b0cae,
     );
     assert_eq!(
-        permit_batch_transfer_from.get_message_hash(owner),
+        permit_batch_transfer_from.get_message_hash(owner()),
         0x6df0ffdf8b15757b5c0899060a95375ae6f96da6d9b6e2d9d4a062d77134610,
     );
     stop_cheat_caller_address_global();
@@ -156,11 +156,11 @@ fn test_permit_transfer_from_message_hash() {
 
 #[test]
 fn test_permit_witness_transfer_from_message_hash() {
-    start_cheat_caller_address_global(spender);
+    start_cheat_caller_address_global(spender());
     let permit = make_permit_transfer_from();
     let witness = make_witness().hash_struct();
     assert_eq!(
-        permit.get_message_hash_with_witness(owner, witness, _WITNESS_TYPE_STRING_FULL()),
+        permit.get_message_hash_with_witness(owner(), witness, _WITNESS_TYPE_STRING_FULL()),
         0x527fab3a4f15f8580ca48249295da21df55baa9c9661ed1425aac50624daba1,
     );
     stop_cheat_caller_address_global();
@@ -168,13 +168,13 @@ fn test_permit_witness_transfer_from_message_hash() {
 
 #[test]
 fn test_permit_witness_batch_transfer_from_message_hash() {
-    start_cheat_caller_address_global(spender);
+    start_cheat_caller_address_global(spender());
     let permit = make_permit_batch_transfer_from();
     let witness_data = make_witness();
     let witness = witness_data.hash_struct();
 
     assert_eq!(
-        permit.get_message_hash_with_witness(owner, witness, _WITNESS_TYPE_STRING_FULL()),
+        permit.get_message_hash_with_witness(owner(), witness, _WITNESS_TYPE_STRING_FULL()),
         0x2a85fe1f98bf044effb5171c76c10420be9a954d0d7df31349af0b9ca687564,
     );
     stop_cheat_caller_address_global();
