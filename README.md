@@ -6,7 +6,7 @@ Cairo implementation of Uniswap Labs's Permit2 contract. Original codebase [here
 
 ### Requirements
 
-- [scarb =2.10.1](https://docs.swmansion.com/scarb/)
+- [scarb = 2.10.1](https://docs.swmansion.com/scarb/)
 - [starknet-foundry >=0.38.3 ](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html)
 
 From the root directory, run:
@@ -16,46 +16,38 @@ From the root directory, run:
 scarb test
 ```
 
-## Deploy
+## Deploy Contract
 
-### Requirements
+A streamlined Go deployment script is available in the [`go/`](./go/) directory.
 
-- [starkli >=0.4.1](https://github.com/xJonathanLEI/starkli)
+**Requirements:**
+- [Go 1.21+](https://golang.org/dl/)
 
-### Setup
+**Setup:**
+1. **Build the contracts** (if not already built):
+   ```bash
+   scarb build && cd go
+   ```
 
-1. Move to the [scripts](./scripts/) directory.
+2. Install dependencies:
+   ```bash
+   go mod tidy
+   ```
 
+3. Copy environment template and configure:
+   ```bash
+   cp env.example .env
+   # Edit .env with your account details
+   ```
+
+**Run deployment:**
 ```bash
-
-cd scripts
+go run main.go
 ```
 
-2. Copy [`.env.example`](./scripts/.env.example) to `.env` and fill in the required values.
-
-3) Copy [`deployer_account.example.json`](./scripts/accounts/deployer_account.example.json) to `deployer_account.json` and fill in your account values.
-
-### Run the script:
-
+**Alternative:** Use the convenience script:
 ```bash
-bash deploy_contract.sh
+./deploy.sh
 ```
 
-The latest deployment address and class hash will be saved to [`latest_deployment.txt`](./scripts/latest_deployment.txt).
-
-## Generate ABI
-
-### Requirements
-
-- [scarb >=2.10.1](https://docs.swmansion.com/scarb/)
-- [abi-wan-kanabi >=2.2.4](https://www.npmjs.com/package/abi-wan-kanabi)
-
-### Generate ABI (for Typescript)
-
-From the script directory, run:
-
-```bash
-bash generate_abi.sh
-```
-
-The generated ABI will be saved to [`permit2.ts`](./abi/permit2.ts).
+The deployment details will be saved to `LATEST_DEPLOYMENT.md`.
