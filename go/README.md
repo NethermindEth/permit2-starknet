@@ -1,9 +1,21 @@
-# Permit2 Contract Deployment
+# Permit2 Go Package
 
-A streamlined Go script for deploying the Permit2 contract on Starknet.
+A modular Go package for Permit2 contract operations on Starknet.
+
+## Package Structure
+
+```
+go/
+├── deployment/          # Contract deployment package
+├── examples/            # Usage examples (coming soon)
+├── main.go             # Main deployment script
+├── deploy.sh           # Convenience script
+└── README.md           # This file
+```
 
 ## Features
 
+- **Modular Design**: Clean separation of concerns
 - **Smart Declaration**: Automatically handles already-declared contracts
 - **UDC Deployment**: Uses Universal Deployer Contract for deployment
 - **Auto Class Hash**: Extracts class hash from contract files when needed
@@ -81,3 +93,17 @@ The `deploy.sh` script automatically:
 - **Name**: Permit2
 - **Constructor**: None
 - **Method**: UDC deployment
+
+## Extending the Package
+
+### Adding New Examples
+
+1. Create new files in the `examples/` directory
+2. Import the deployment package: `"github.com/NethermindEth/oif-starknet/go/deployment"`
+3. Use the `Deployer` struct for contract operations
+
+### Adding New Features
+
+1. Create new packages in the root `go/` directory
+2. Follow the same modular structure
+3. Update this README with new functionality

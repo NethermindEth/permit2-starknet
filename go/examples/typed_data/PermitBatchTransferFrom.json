@@ -1,0 +1,42 @@
+{
+  "domain": {
+    "name": "Permit2",
+    "version": "v1",
+    "chainId": "SN_SEPOLIA",
+    "revision": "1"
+  },
+  "primaryType": "Permit Batch Transfer From",
+  "message": {
+    "Permitted": [
+      {
+        "Token": "0x1234",
+        "Amount": { "low": "0x1", "high": "0x0" }
+      },
+      {
+        "Token": "0x1234",
+        "Amount": { "low": "0x1", "high": "0x0" }
+      }
+    ],
+    "Spender": "0x5678",
+    "Nonce": "1",
+    "Deadline": { "low": "0x1234567890", "high": "0x0" }
+  },
+  "types": {
+    "StarknetDomain": [
+      { "name": "name", "type": "shortstring" },
+      { "name": "version", "type": "shortstring" },
+      { "name": "chainId", "type": "shortstring" },
+      { "name": "revision", "type": "shortstring" }
+    ],
+    "Token Permissions": [
+      { "name": "Token", "type": "ContractAddress" },
+      { "name": "Amount", "type": "u256" }
+    ],
+    "Permit Batch Transfer From": [
+      { "name": "Permitted", "type": "Token Permissions*" },
+      { "name": "Spender", "type": "ContractAddress" },
+      { "name": "Nonce", "type": "felt" },
+      { "name": "Deadline", "type": "u256" }
+    ]
+  }
+}

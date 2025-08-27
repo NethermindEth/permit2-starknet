@@ -18,7 +18,7 @@ scarb test
 
 ## Deploy Contract
 
-A streamlined Go deployment script is available in the [`go/`](./go/) directory.
+A modular Go package for deployment is available in the [`go/`](./go/) directory.
 
 **Requirements:**
 
@@ -58,3 +58,8 @@ go run main.go
 ```
 
 The deployment details will be saved to `LATEST_DEPLOYMENT.md`.
+
+**Package Structure:**
+- `deployment/` - Core deployment logic
+- `examples/` - Usage examples (coming soon)
+- `main.go` - Main deployment script

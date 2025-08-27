@@ -1,4 +1,4 @@
-module permit2-deploy
+module github.com/NethermindEth/oif-starknet/go
 
 go 1.23.4
 
