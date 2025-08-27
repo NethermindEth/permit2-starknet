@@ -90,7 +90,7 @@ pub impl StructHashSpanFelt252 of StructHash<Span<felt252>> {
         let mut state = PoseidonTrait::new();
         for el in (*self) {
             state = state.update_with(*el);
-        }
+        };
         state.finalize()
     }
 }
@@ -100,7 +100,7 @@ pub impl StructHashSpanU128 of StructHash<Span<u128>> {
         let mut state = PoseidonTrait::new();
         for el in (*self) {
             state = state.update_with(*el);
-        }
+        };
         state.finalize()
     }
 }

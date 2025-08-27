@@ -28,10 +28,6 @@ pub mod MockNonPermitToken {
         self.erc20.initializer(name, symbol);
     }
 
-    pub impl ImutableConfig of ERC20Component::ImmutableConfig {
-        const DECIMALS: u8 = 18;
-    }
-
     #[abi(embed_v0)]
     impl MockNonPermitTokenImpl of IMockNonPermitToken<ContractState> {
         fn DOMAIN_SEPARATOR(self: @ContractState) -> felt252 {

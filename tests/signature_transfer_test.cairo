@@ -94,14 +94,14 @@ fn test_permit_batch_transfer_from() {
     let setup = setup();
     let nonce = 0;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions: Span<TokenPermissions> = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: 10 * E18 })
-        .collect::<Array<_>>()
-        .span();
+
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: 10 * E18 });
+    };
+
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (get_block_timestamp() + 100).into(),
+        permitted: token_permissions.span(), nonce, deadline: (get_block_timestamp() + 100).into(),
     };
     let transfer_details = array![
         SignatureTransferDetails {
@@ -192,14 +192,14 @@ fn test_should_panic_permit_batch_transfer_from_nonce_already_invalidated() {
     let setup = setup();
     let nonce = 0;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions: Span<TokenPermissions> = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: 10 * E18 })
-        .collect::<Array<_>>()
-        .span();
+
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: 10 * E18 });
+    };
+
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (get_block_timestamp() + 100).into(),
+        permitted: token_permissions.span(), nonce, deadline: (get_block_timestamp() + 100).into(),
     };
     let transfer_details = array![
         SignatureTransferDetails {
@@ -357,12 +357,12 @@ fn test_permit_batch_tranfer_from_multi_permit_single_transfer() {
 
     let nonce = 0;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
+
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -373,7 +373,7 @@ fn test_permit_batch_tranfer_from_multi_permit_single_transfer() {
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (get_block_timestamp() + 100).into(),
+        permitted: token_permissions.span(), nonce, deadline: (get_block_timestamp() + 100).into(),
     };
 
     // Hashing uses the caller's address, so we must mock it here
@@ -603,12 +603,11 @@ fn test_permit_batch_transfer_from_with_invalid_signature_should_panic() {
     let nonce = 0;
     let default_expiration = get_block_timestamp() + 5;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
+
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -619,7 +618,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_should_panic() {
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (default_expiration).into(),
+        permitted: token_permissions.span(), nonce, deadline: (default_expiration).into(),
     };
 
     // Hashing uses the caller's address, so we must mock it here
@@ -646,12 +645,10 @@ fn test_permit_batch_transfer_from_with_invalid_signature_length_should_panic() 
     let nonce = 0;
     let default_expiration = get_block_timestamp() + 5;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -662,7 +659,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_length_should_panic() 
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (default_expiration).into(),
+        permitted: token_permissions.span(), nonce, deadline: (default_expiration).into(),
     };
 
     // Hashing uses the caller's address, so we must mock it here
@@ -689,12 +686,10 @@ fn test_permit_batch_transfer_from_with_invalid_signature_length_should_panic2()
     let nonce = 0;
     let default_expiration = get_block_timestamp() + 5;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -705,7 +700,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_length_should_panic2()
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (default_expiration).into(),
+        permitted: token_permissions.span(), nonce, deadline: (default_expiration).into(),
     };
 
     // Hashing uses the caller's address, so we must mock it here
@@ -732,12 +727,10 @@ fn test_permit_batch_transfer_from_when_deadline_passed_should_panic() {
     let nonce = 0;
     let default_expiration = get_block_timestamp() + 5;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -748,7 +741,7 @@ fn test_permit_batch_transfer_from_when_deadline_passed_should_panic() {
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (default_expiration).into(),
+        permitted: token_permissions.span(), nonce, deadline: (default_expiration).into(),
     };
 
     // Hashing uses the caller's address, so we must mock it here
@@ -811,12 +804,10 @@ fn test_permit_batch_transfer_with_invalid_spender_should_panic() {
     let nonce = 0;
     let default_expiration = get_block_timestamp() + 5;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -827,7 +818,7 @@ fn test_permit_batch_transfer_with_invalid_spender_should_panic() {
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (default_expiration).into(),
+        permitted: token_permissions.span(), nonce, deadline: (default_expiration).into(),
     };
 
     // Hashing uses the caller's address, so we must mock it here
@@ -989,12 +980,10 @@ fn test_permit_batch_witness_transfer_with_invalid_spender_should_panic() {
     let nonce = 0;
     let default_expiration = get_block_timestamp() + 5;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -1005,7 +994,7 @@ fn test_permit_batch_witness_transfer_with_invalid_spender_should_panic() {
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (default_expiration).into(),
+        permitted: token_permissions.span(), nonce, deadline: (default_expiration).into(),
     };
     let witness = make_witness();
 
@@ -1042,12 +1031,10 @@ fn test_permit_witness_batch_transfer_from_with_invalid_witness_should_panic() {
     let nonce = 0;
     let default_expiration = get_block_timestamp() + 5;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -1058,7 +1045,7 @@ fn test_permit_witness_batch_transfer_from_with_invalid_witness_should_panic() {
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (default_expiration).into(),
+        permitted: token_permissions.span(), nonce, deadline: (default_expiration).into(),
     };
     let mut witness = make_witness();
 
@@ -1096,12 +1083,10 @@ fn test_permit_witness_batch_transfer_from_with_invalid_witness_type_string_shou
     let nonce = 0;
     let default_expiration = get_block_timestamp() + 5;
     let tokens = array![setup.token0.contract_address, setup.token1.contract_address];
-    let token_permissions = tokens
-        .clone()
-        .into_iter()
-        .map(|token| TokenPermissions { token, amount: DEFAULT_AMOUNT })
-        .collect::<Array<_>>()
-        .span();
+    let mut token_permissions: Array<TokenPermissions> = array![];
+    for token in tokens.span() {
+        token_permissions.append(TokenPermissions { token: *token, amount: DEFAULT_AMOUNT });
+    };
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
@@ -1112,7 +1097,7 @@ fn test_permit_witness_batch_transfer_from_with_invalid_witness_type_string_shou
     ]
         .span();
     let permit = PermitBatchTransferFrom {
-        permitted: token_permissions, nonce, deadline: (default_expiration).into(),
+        permitted: token_permissions.span(), nonce, deadline: (default_expiration).into(),
     };
     let witness = make_witness();
     let mut witness_type_string = _WITNESS_TYPE_STRING_FULL();

@@ -12,12 +12,12 @@ use permit2::snip12_utils::permits::{
 use starknet::ContractAddress;
 use crate::mocks::mock_witness::{Beta, MockWitness, MockWitnessStructHash, Zeta};
 
-
-pub const spender: ContractAddress = 0x5678.try_into().unwrap();
-pub const owner: ContractAddress = 0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec
-    .try_into()
-    .unwrap();
-
+pub fn spender() -> ContractAddress {
+    0x5678_felt252.try_into().unwrap()
+}
+pub fn owner() -> ContractAddress {
+    0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec.try_into().unwrap()
+}
 
 pub fn make_permit_single() -> PermitSingle {
     let token: ContractAddress = 0x1234.try_into().unwrap();
@@ -27,7 +27,9 @@ pub fn make_permit_single() -> PermitSingle {
     let sig_deadline = 0x1234567890;
 
     PermitSingle {
-        details: PermitDetails { token, amount, expiration, nonce }, spender: spender, sig_deadline,
+        details: PermitDetails { token, amount, expiration, nonce },
+        spender: spender(),
+        sig_deadline,
     }
 }
 
