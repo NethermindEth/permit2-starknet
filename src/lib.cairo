@@ -24,4 +24,5 @@ pub mod snip12_utils {
 }
 
 pub mod permit2;
+pub mod mock_erc20;
 
