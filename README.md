@@ -7,7 +7,7 @@ Cairo implementation of Uniswap Labs's Permit2 contract. Original codebase [here
 ### Requirements
 
 - [scarb = 2.10.1](https://docs.swmansion.com/scarb/)
-- [starknet-foundry >=0.38.3 ](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html)
+- [starknet-foundry> = 0.38.3](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html)
 
 From the root directory, run:
 
@@ -21,31 +21,38 @@ scarb test
 A streamlined Go deployment script is available in the [`go/`](./go/) directory.
 
 **Requirements:**
+
 - [Go 1.21+](https://golang.org/dl/)
 
 **Setup:**
+
 1. **Build the contracts** (if not already built):
+
    ```bash
    scarb build && cd go
    ```
 
 2. Install dependencies:
+
    ```bash
    go mod tidy
    ```
 
 3. Copy environment template and configure:
+
    ```bash
    cp env.example .env
    # Edit .env with your account details
    ```
 
 **Run deployment:**
+
 ```bash
 go run main.go
 ```
 
 **Alternative:** Use the convenience script:
+
 ```bash
 ./deploy.sh
 ```
