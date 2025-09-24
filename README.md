@@ -12,7 +12,6 @@ Cairo implementation of Uniswap Labs's Permit2 contract. Original codebase [here
 From the root directory, run:
 
 ```bash
-
 scarb test
 ```
 
@@ -60,6 +59,7 @@ go run main.go
 The deployment details will be saved to `LATEST_DEPLOYMENT.md`.
 
 **Package Structure:**
+
 - `deployment/` - Core deployment logic
 - `examples/` - Usage examples (coming soon)
 - `main.go` - Main deployment script
