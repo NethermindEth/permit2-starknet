@@ -8,12 +8,10 @@ pub const SHIFT_8: u256 = 0b100000000;
 pub const INDEX_OUT_OF_RANGE: felt252 = 'Index out of range';
 pub const NONCE_SPACE_OVERFLOW: felt252 = 'Nonce space overflow';
 pub const BIT_POSITION_OVERFLOW: felt252 = 'Bit position overflow';
-pub fn MAX_NONCE_SPACE() -> u256 {
-    2_u256.pow(243) - 1
-}
-pub fn MAX_BIT_MAP() -> u256 {
-    2_u256.pow(251) - 1
-}
+// 2_u256.pow(243) - 1
+pub const MAX_NONCE_SPACE: u256 = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+// 2_u256.pow(251) - 1
+pub const MAX_BIT_MAP: u256 = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
 /// The `BitmapTrait` trait provides an interface for managing a bitmap representation
 /// of nonces. It allows for the creation of a new bitmap, setting and unsetting bits
@@ -96,7 +94,7 @@ pub trait BitmapPackingTrait<T> {
 pub impl FeltBitmapPackingTraitImpl of BitmapPackingTrait<felt252> {
     fn pack_nonce(nonce_space: felt252, index: u8) -> felt252 {
         assert(index < 251, BIT_POSITION_OVERFLOW);
-        assert(nonce_space.into() <= MAX_NONCE_SPACE(), NONCE_SPACE_OVERFLOW);
+        assert(nonce_space.into() <= MAX_NONCE_SPACE, NONCE_SPACE_OVERFLOW);
 
         ((nonce_space.into() * SHIFT_8) + index.into()).try_into().unwrap()
     }
@@ -107,7 +105,7 @@ pub impl FeltBitmapPackingTraitImpl of BitmapPackingTrait<felt252> {
         let nonce_space = nonce / SHIFT_8;
 
         assert(index < 251, BIT_POSITION_OVERFLOW);
-        assert(nonce_space <= MAX_NONCE_SPACE(), NONCE_SPACE_OVERFLOW);
+        assert(nonce_space <= MAX_NONCE_SPACE, NONCE_SPACE_OVERFLOW);
 
         (nonce_space.try_into().unwrap(), index.try_into().unwrap())
     }
