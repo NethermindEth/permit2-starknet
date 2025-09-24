@@ -3,7 +3,7 @@ use openzeppelin_token::erc20::interface::{
     IERC20PermitSafeDispatcher, IERC20PermitSafeDispatcherTrait, IERC20SafeDispatcher,
     IERC20SafeDispatcherTrait,
 };
-use permit2::interfaces::allowance_transfer::{
+use crate::interfaces::allowance_transfer::{
     IAllowanceTransferDispatcher, IAllowanceTransferDispatcherTrait, PermitDetails, PermitSingle,
 };
 use starknet::ContractAddress;

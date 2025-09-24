@@ -3,14 +3,14 @@ pub mod SignatureTransferComponent {
     use openzeppelin_account::interface::{ISRC6Dispatcher, ISRC6DispatcherTrait};
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use openzeppelin_utils::cryptography::snip12::{OffchainMessageHash, SNIP12Metadata};
-    use permit2::components::unordered_nonces::UnorderedNoncesComponent;
-    use permit2::components::unordered_nonces::UnorderedNoncesComponent::{
+    use crate::components::unordered_nonces::UnorderedNoncesComponent;
+    use crate::components::unordered_nonces::UnorderedNoncesComponent::{
         InternalTrait as NoncesInternalTrait, UnorderedNoncesImpl,
     };
-    use permit2::interfaces::signature_transfer::{
+    use crate::interfaces::signature_transfer::{
         ISignatureTransfer, PermitBatchTransferFrom, PermitTransferFrom, SignatureTransferDetails,
     };
-    use permit2::snip12_utils::permits::{
+    use crate::snip12_utils::permits::{
         OffchainMessageHashWitnessTrait, PermitBatchStructHash, PermitBatchTransferFromStructHash,
         PermitBatchTransferFromStructHashWitness, PermitSingleStructHash,
         PermitTransferFromStructHash, PermitTransferFromStructHashWitness,

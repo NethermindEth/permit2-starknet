@@ -1,7 +1,7 @@
 #[starknet::component]
 pub mod UnorderedNoncesComponent {
-    use permit2::interfaces::unordered_nonces::IUnorderedNonces;
-    use permit2::libraries::bitmap::{
+    use crate::interfaces::unordered_nonces::IUnorderedNonces;
+    use crate::libraries::bitmap::{
         BIT_POSITION_OVERFLOW, BitmapPackingTrait, BitmapTrait, MAX_BIT_MAP,
     };
     use starknet::storage::{

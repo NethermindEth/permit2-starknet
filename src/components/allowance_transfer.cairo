@@ -4,12 +4,12 @@ pub mod AllowanceTransferComponent {
     use openzeppelin_account::interface::{ISRC6Dispatcher, ISRC6DispatcherTrait};
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use openzeppelin_utils::cryptography::snip12::{OffchainMessageHash, SNIP12Metadata};
-    use permit2::interfaces::allowance_transfer::{
+    use crate::interfaces::allowance_transfer::{
         AllowanceTransferDetails, IAllowanceTransfer, PermitBatch, PermitDetails, PermitSingle,
         TokenSpenderPair,
     };
-    use permit2::libraries::allowance::{Allowance, AllowanceTrait};
-    use permit2::snip12_utils::permits::{
+    use crate::libraries::allowance::{Allowance, AllowanceTrait};
+    use crate::snip12_utils::permits::{
         PermitBatchStructHash, PermitDetailsStructHash, PermitSingleStructHash,
     };
     use starknet::storage::{
