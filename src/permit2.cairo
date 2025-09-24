@@ -3,10 +3,10 @@ pub mod Permit2 {
     use openzeppelin_utils::cryptography::snip12::{
         SNIP12Metadata, StarknetDomain, StructHashStarknetDomainImpl,
     };
-    use permit2::components::allowance_transfer::AllowanceTransferComponent;
-    use permit2::components::signature_transfer::SignatureTransferComponent;
-    use permit2::components::unordered_nonces::UnorderedNoncesComponent;
-    use permit2::interfaces::permit2::IPermit2;
+    use crate::components::allowance_transfer::AllowanceTransferComponent;
+    use crate::components::signature_transfer::SignatureTransferComponent;
+    use crate::components::unordered_nonces::UnorderedNoncesComponent;
+    use crate::interfaces::permit2::IPermit2;
     use starknet::get_tx_info;
 
 

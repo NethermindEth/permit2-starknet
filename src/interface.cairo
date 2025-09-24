@@ -1,7 +1,7 @@
-use permit2::interfaces::allowance_transfer::{
+use crate::interfaces::allowance_transfer::{
     AllowanceTransferDetails, PermitBatch, PermitSingle, TokenSpenderPair,
 };
-use permit2::interfaces::signature_transfer::{
+use crate::interfaces::signature_transfer::{
     PermitBatchTransferFrom, PermitTransferFrom, SignatureTransferDetails,
 };
 use starknet::ContractAddress;

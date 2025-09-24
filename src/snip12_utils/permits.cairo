@@ -3,11 +3,11 @@ use core::poseidon::PoseidonTrait;
 use openzeppelin_utils::cryptography::snip12::{
     SNIP12HashSpanImpl, SNIP12Metadata, StarknetDomain, StructHash,
 };
-use permit2::interfaces::allowance_transfer::{PermitBatch, PermitDetails, PermitSingle};
-use permit2::interfaces::signature_transfer::{
+use crate::interfaces::allowance_transfer::{PermitBatch, PermitDetails, PermitSingle};
+use crate::interfaces::signature_transfer::{
     PermitBatchTransferFrom, PermitTransferFrom, TokenPermissions,
 };
-use permit2::libraries::utils::selector;
+use crate::libraries::utils::selector;
 use starknet::{ContractAddress, get_caller_address, get_tx_info};
 
 /// TYPE HASHES (see tests/permit_hash_test.cairo)
