@@ -36,7 +36,7 @@ const REVISION: felt252 = 1;
 
 
 #[test]
-fn test_domain_seperator() {
+fn test_domain_separator() {
     let permit2_ = IPermit2Dispatcher { contract_address: deploy_permit2() };
     let expected = PoseidonTrait::new()
         .update_with(STARKNET_DOMAIN_TYPE_HASH)
@@ -50,9 +50,9 @@ fn test_domain_seperator() {
 }
 
 #[test]
-fn test_domain_seperator_after_fork() {
+fn test_domain_separator_after_fork() {
     let permit2 = IPermit2Dispatcher { contract_address: deploy_permit2() };
-    let begenning_seperator = permit2.DOMAIN_SEPARATOR();
+    let beginning_separator = permit2.DOMAIN_SEPARATOR();
     let new_chain_id = get_tx_info().unbox().chain_id + 1;
 
     start_cheat_chain_id_global(new_chain_id);
@@ -64,7 +64,7 @@ fn test_domain_seperator_after_fork() {
         .update_with(REVISION)
         .finalize();
 
-    assert_ne!(begenning_seperator, permit2.DOMAIN_SEPARATOR());
+    assert_ne!(beginning_separator, permit2.DOMAIN_SEPARATOR());
     assert_eq!(permit2.DOMAIN_SEPARATOR(), expected);
 
     stop_cheat_chain_id_global();

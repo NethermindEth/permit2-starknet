@@ -1,8 +1,9 @@
 // From:
 // https://github.com/starkware-libs/cairo/blob/17190043094456e70c764a1463f7a16a56cdb971/crates/cairo-lang-starknet/cairo_level_tests/keccak.cairo#L2
-// Mimics `selector!` macro, allows BA vars to be used instead of in-line strings like the macro
-pub fn selector(ba: ByteArray) -> felt252 {
-    let value = core::keccak::compute_keccak_byte_array(@ba);
+// Dynamically computes a selector from a ByteArray at runtime.
+// Runtime version of the `selector!` macro.
+pub fn selector(input: ByteArray) -> felt252 {
+    let value = core::keccak::compute_keccak_byte_array(@input);
     u256 {
         low: core::integer::u128_byte_reverse(value.high),
         high: core::integer::u128_byte_reverse(value.low) & 0x3ffffffffffffffffffffffffffffff,

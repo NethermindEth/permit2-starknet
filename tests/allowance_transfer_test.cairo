@@ -1111,7 +1111,7 @@ fn test_batch_transfer_from_different_owners() {
 
     let start_balance_from = setup.token0.balance_of(setup.from.account.contract_address);
     let start_balance_to = setup.token0.balance_of(setup.to.account.contract_address);
-    let start_balance_recepient = setup.token0.balance_of(setup.bystander);
+    let start_balance_recipient = setup.token0.balance_of(setup.bystander);
 
     // Bystander uses permit to approve `from` and `to` to spend `DEFAULT_AMOUNT` of `token0`
     start_cheat_caller_address(setup.permit2.contract_address, setup.from.account.contract_address);
@@ -1153,11 +1153,11 @@ fn test_batch_transfer_from_different_owners() {
 
     let end_balance_from = setup.token0.balance_of(setup.from.account.contract_address);
     let end_balance_to = setup.token0.balance_of(setup.to.account.contract_address);
-    let end_balance_recepient = setup.token0.balance_of(setup.bystander);
+    let end_balance_recipient = setup.token0.balance_of(setup.bystander);
 
     assert_eq!(end_balance_from, start_balance_from - E18);
     assert_eq!(end_balance_to, start_balance_to - E18);
-    assert_eq!(end_balance_recepient, start_balance_recepient + 2 * E18);
+    assert_eq!(end_balance_recipient, start_balance_recipient + 2 * E18);
 
     let (amount, _, _) = setup
         .permit2
