@@ -112,24 +112,8 @@ pub impl Permit2LibImpl of Permit2Lib {
             }
         }
 
-        //simple_permit2(token, owner, spender, amount, deadline.into(), signature, permit2);
-        //possible ?
-
         // If there is no domain separator or permit fails, fall back to Permit2::permit()
-        let permit2 = IAllowanceTransferDispatcher { contract_address: permit2 };
-        let (_, _, nonce) = permit2.allowance(owner, token, spender);
-        permit2
-            .permit(
-                owner,
-                PermitSingle {
-                    details: PermitDetails {
-                        token, amount, expiration: Bounded::<u64>::MAX, nonce,
-                    },
-                    spender,
-                    sig_deadline: deadline.into(),
-                },
-                signature,
-            );
+        Self::simple_permit2(token, owner, spender, amount, deadline.into(), signature, permit2)
     }
 
     fn simple_permit2(
