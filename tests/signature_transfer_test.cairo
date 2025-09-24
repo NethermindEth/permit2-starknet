@@ -352,7 +352,7 @@ fn test_permit_transfer_spend_less_than_full(mut nonce: felt252, amount: u256) {
 }
 
 #[test]
-fn test_permit_batch_tranfer_from_multi_permit_single_transfer() {
+fn test_permit_batch_transfer_from_multi_permit_single_transfer() {
     let setup = setup();
 
     let nonce = 0;
@@ -366,7 +366,7 @@ fn test_permit_batch_tranfer_from_multi_permit_single_transfer() {
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },
@@ -611,7 +611,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_should_panic() {
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },
@@ -652,7 +652,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_length_should_panic() 
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },
@@ -693,7 +693,7 @@ fn test_permit_batch_transfer_from_with_invalid_signature_length_should_panic2()
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },
@@ -734,7 +734,7 @@ fn test_permit_batch_transfer_from_when_deadline_passed_should_panic() {
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },
@@ -811,7 +811,7 @@ fn test_permit_batch_transfer_with_invalid_spender_should_panic() {
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },
@@ -987,7 +987,7 @@ fn test_permit_batch_witness_transfer_with_invalid_spender_should_panic() {
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },
@@ -1038,7 +1038,7 @@ fn test_permit_witness_batch_transfer_from_with_invalid_witness_should_panic() {
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },
@@ -1090,7 +1090,7 @@ fn test_permit_witness_batch_transfer_from_with_invalid_witness_type_string_shou
     let transfer_details = array![
         // Transfer 0 tokens
         SignatureTransferDetails { to: setup.to.account.contract_address, requested_amount: 0 },
-        // Transer some tokens
+        // Transfer some tokens
         SignatureTransferDetails {
             to: setup.to.account.contract_address, requested_amount: DEFAULT_AMOUNT,
         },

@@ -42,7 +42,7 @@ pub mod AllowanceTransferComponent {
         Lockdown: Lockdown,
     }
 
-    /// Emited when the owner successfully invalidates an ordered nonce.
+    /// Emitted when the owner successfully invalidates an ordered nonce.
     #[derive(Drop, starknet::Event)]
     pub struct NonceInvalidation {
         #[key]
