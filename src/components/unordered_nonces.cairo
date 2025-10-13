@@ -79,7 +79,7 @@ pub mod UnorderedNoncesComponent {
             let bitmap = bitmap_storage.read();
             let mask_u256: u256 = mask.into();
 
-            assert(mask_u256 <= MAX_BIT_MAP(), BIT_POSITION_OVERFLOW);
+            assert(mask_u256 <= MAX_BIT_MAP, BIT_POSITION_OVERFLOW);
 
             let new_bitmap = (bitmap.into() | mask_u256).try_into().unwrap();
             bitmap_storage.write(new_bitmap);
