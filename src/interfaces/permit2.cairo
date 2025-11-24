@@ -1,5 +1,5 @@
 #[starknet::interface]
-pub trait IPermit2<TState> {
+pub trait IDomainSeparator<TState> {
     fn DOMAIN_SEPARATOR(self: @TState) -> felt252;
 }
 

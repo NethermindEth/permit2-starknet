@@ -6,7 +6,7 @@ pub mod Permit2 {
     use crate::components::allowance_transfer::AllowanceTransferComponent;
     use crate::components::signature_transfer::SignatureTransferComponent;
     use crate::components::unordered_nonces::UnorderedNoncesComponent;
-    use crate::interfaces::permit2::IPermit2;
+    use crate::interfaces::permit2::IDomainSeparator;
     use starknet::get_tx_info;
 
 
@@ -66,7 +66,7 @@ pub mod Permit2 {
     }
 
     #[abi(embed_v0)]
-    pub impl Permit2 of IPermit2<ContractState> {
+    pub impl Permit2 of IDomainSeparator<ContractState> {
         fn DOMAIN_SEPARATOR(self: @ContractState) -> felt252 {
             let domain = StarknetDomain {
                 name: SNIP12MetadataImpl::name(),
