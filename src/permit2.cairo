@@ -55,11 +55,15 @@ pub mod Permit2 {
 
     pub impl SNIP12MetadataImpl of SNIP12Metadata {
         /// Returns the name of the SNIP-12 metadata.
+        ///
+        /// Returns the name 'Permit2' as a felt252.
         fn name() -> felt252 {
             'Permit2'
         }
 
         /// Returns the version of the SNIP-12 metadata.
+        ///
+        /// Returns the version 'v1' as a felt252.
         fn version() -> felt252 {
             'v1'
         }
@@ -67,6 +71,11 @@ pub mod Permit2 {
 
     #[abi(embed_v0)]
     pub impl Permit2 of IDomainSeparator<ContractState> {
+        /// Returns the domain separator for SNIP-12 signature verification.
+        ///
+        /// The domain separator is computed from the contract name, version, chain ID, and revision.
+        ///
+        /// Returns the domain separator as a felt252.
         fn DOMAIN_SEPARATOR(self: @ContractState) -> felt252 {
             let domain = StarknetDomain {
                 name: SNIP12MetadataImpl::name(),

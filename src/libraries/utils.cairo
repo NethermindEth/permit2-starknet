@@ -2,6 +2,17 @@
 // https://github.com/starkware-libs/cairo/blob/17190043094456e70c764a1463f7a16a56cdb971/crates/cairo-lang-starknet/cairo_level_tests/keccak.cairo#L2
 // Dynamically computes a selector from a ByteArray at runtime.
 // Runtime version of the `selector!` macro.
+///
+/// Computes a function selector from a ByteArray at runtime.
+///
+/// This is the runtime version of the `selector!` macro, dynamically computing
+/// a selector using keccak hashing.
+///
+/// Parameters:
+///
+/// - 'input': The ByteArray to compute the selector for.
+///
+/// Returns the computed selector as a felt252.
 pub fn selector(input: ByteArray) -> felt252 {
     let value = core::keccak::compute_keccak_byte_array(@input);
     u256 {

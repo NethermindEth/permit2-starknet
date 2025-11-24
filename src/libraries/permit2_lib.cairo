@@ -15,10 +15,10 @@ pub trait Permit2Lib {
     ///
     /// Parameters:
     ///
-    /// - `token`: The token to transfer.
-    /// - `from`: The user to transfer from.
-    /// - `to`: The` user to transfer to.
-    /// - `amount`: The amount to transfer.
+    /// - 'token': The token to transfer.
+    /// - 'from': The user to transfer from.
+    /// - 'to': The user to transfer to.
+    /// - 'amount': The amount to transfer.
     fn transfer_from2(
         token: ContractAddress,
         from: ContractAddress,
@@ -33,12 +33,12 @@ pub trait Permit2Lib {
     ///
     /// Parameters:
     ///
-    /// `token`: The token to permit spending.
-    /// `owner`: The user to permit spending from.
-    /// `spender`: The user to permit spending to.
-    /// `amount`: The amount to permit spending.
-    /// `deadline`:  The timestamp after which the signature is no longer valid.
-    /// `signature`:  The signature of the permit.
+    /// - 'token': The token to permit spending.
+    /// - 'owner': The user to permit spending from.
+    /// - 'spender': The user to permit spending to.
+    /// - 'amount': The amount to permit spending.
+    /// - 'deadline': The timestamp after which the signature is no longer valid.
+    /// - 'signature': The signature of the permit.
     fn permit2(
         token: ContractAddress,
         owner: ContractAddress,
@@ -52,12 +52,13 @@ pub trait Permit2Lib {
     /// Simple unlimited permit on the Permit2 contract.
     ///
     /// Parameters:
-    /// - `token`: The token to permit spending.
-    /// - `owner`: The user to permit spending from.
-    /// - `spender`: The user to permit spending to.
-    /// - `amount`: The amount to permit spending.
-    /// - `deadline`: The timestamp after which the signature is no longer valid.
-    /// - `signature`: The signature of the pemrit
+    ///
+    /// - 'token': The token to permit spending.
+    /// - 'owner': The user to permit spending from.
+    /// - 'spender': The user to permit spending to.
+    /// - 'amount': The amount to permit spending.
+    /// - 'deadline': The timestamp after which the signature is no longer valid.
+    /// - 'signature': The signature of the permit.
     fn simple_permit2(
         token: ContractAddress,
         owner: ContractAddress,
@@ -71,6 +72,15 @@ pub trait Permit2Lib {
 
 pub impl Permit2LibImpl of Permit2Lib {
     #[feature("safe_dispatcher")]
+    /// Implementation of transfer_from2 that attempts native ERC20 transfer first, then falls back to Permit2.
+    ///
+    /// Parameters:
+    ///
+    /// - 'token': The token to transfer.
+    /// - 'from': The user to transfer from.
+    /// - 'to': The user to transfer to.
+    /// - 'amount': The amount to transfer.
+    /// - 'permit2': The Permit2 contract address.
     fn transfer_from2(
         token: ContractAddress,
         from: ContractAddress,
@@ -90,6 +100,17 @@ pub impl Permit2LibImpl of Permit2Lib {
     }
 
     #[feature("safe_dispatcher")]
+    /// Implementation of permit2 that attempts native ERC20Permit permit first, then falls back to Permit2.
+    ///
+    /// Parameters:
+    ///
+    /// - 'token': The token to permit spending.
+    /// - 'owner': The user to permit spending from.
+    /// - 'spender': The user to permit spending to.
+    /// - 'amount': The amount to permit spending.
+    /// - 'deadline': The timestamp after which the signature is no longer valid.
+    /// - 'signature': The signature of the permit.
+    /// - 'permit2': The Permit2 contract address.
     fn permit2(
         token: ContractAddress,
         owner: ContractAddress,
@@ -116,6 +137,17 @@ pub impl Permit2LibImpl of Permit2Lib {
         Self::simple_permit2(token, owner, spender, amount, deadline.into(), signature, permit2)
     }
 
+    /// Simple unlimited permit on the Permit2 contract implementation.
+    ///
+    /// Parameters:
+    ///
+    /// - 'token': The token to permit spending.
+    /// - 'owner': The user to permit spending from.
+    /// - 'spender': The user to permit spending to.
+    /// - 'amount': The amount to permit spending.
+    /// - 'deadline': The timestamp after which the signature is no longer valid.
+    /// - 'signature': The signature of the permit.
+    /// - 'permit2': The Permit2 contract address.
     fn simple_permit2(
         token: ContractAddress,
         owner: ContractAddress,

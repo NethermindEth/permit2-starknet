@@ -9,12 +9,18 @@ use crate::interfaces::signature_transfer::{
 
 #[starknet::interface]
 pub trait IDomainSeparator<TState> {
+    /// Returns the domain separator for SNIP-12 signature verification.
+    ///
+    /// Returns the domain separator as a felt252.
     fn DOMAIN_SEPARATOR(self: @TState) -> felt252;
 }
 
 #[starknet::interface]
 pub trait IPermit2ABI<TState> {
     /// IDomainSeparator ///
+    /// Returns the domain separator for SNIP-12 signature verification.
+    ///
+    /// Returns the domain separator as a felt252.
     fn DOMAIN_SEPARATOR(self: @TState) -> felt252;
     /// IAllowanceTransfer ///
     fn allowance(
@@ -45,7 +51,7 @@ pub trait IPermit2ABI<TState> {
     fn invalidate_nonces(
         ref self: TState, token: ContractAddress, spender: ContractAddress, new_nonce: u64,
     );
-    /// ISignatrueTransfer ///
+    /// ISignatureTransfer ///
     fn permit_transfer_from(
         ref self: TState,
         permit: PermitTransferFrom,

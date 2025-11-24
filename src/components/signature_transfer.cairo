@@ -117,6 +117,15 @@ pub mod SignatureTransferComponent {
         impl Nonces: UnorderedNoncesComponent::HasComponent<TContractState>,
         impl Metadata: SNIP12Metadata,
     > of InternalTrait<TContractState> {
+        /// Internal function to transfer a token using a signed permit message.
+        ///
+        /// Parameters:
+        ///
+        /// - 'permit': The permit data signed over by the owner.
+        /// - 'transfer_details': The spender's requested transfer details for the permitted token.
+        /// - 'owner': The owner of the tokens to transfer.
+        /// - 'data_hash': The hash of the permit data to verify the signature against.
+        /// - 'signature': The signature to verify.
         fn _permit_transfer_from(
             ref self: ComponentState<TContractState>,
             permit: PermitTransferFrom,
@@ -149,6 +158,15 @@ pub mod SignatureTransferComponent {
                 .transfer_from(owner, transfer_details.to, requested_amount);
         }
 
+        /// Internal function to transfer multiple tokens using a signed permit message.
+        ///
+        /// Parameters:
+        ///
+        /// - 'permit': The permit data signed over by the owner.
+        /// - 'transfer_details': Specifies the recipient and requested amount for each token transfer.
+        /// - 'owner': The owner of the tokens to transfer.
+        /// - 'data_hash': The hash of the permit data to verify the signature against.
+        /// - 'signature': The signature to verify.
         fn _permit_batch_transfer_from(
             ref self: ComponentState<TContractState>,
             permit: PermitBatchTransferFrom,

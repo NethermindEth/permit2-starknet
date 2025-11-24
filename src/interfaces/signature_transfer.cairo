@@ -90,22 +90,30 @@ pub trait ISignatureTransfer<TState> {
     );
 }
 
-/// The token and amount details for a transfer signed in the permit transfer signature
-/// @param token The ERC20 token address
-/// @param amount The maximum amount that can be spent
+/// The token and amount details for a transfer signed in the permit transfer signature.
+///
+/// Parameters:
+///
+/// - 'token': The ERC20 token address.
+/// - 'amount': The maximum amount that can be spent.
 #[derive(Drop, Copy, Hash, Serde)]
 pub struct TokenPermissions {
     pub token: ContractAddress,
     pub amount: u256,
 }
 
-/// The signed permit message for a single token transfer
-/// @dev Do not need to pass in spender address as it is required that it is msg.sender
-/// @dev A user still signs over a spender address (spender is located between `permitted` &
-/// `nonce`)
-/// @param permitted The token permissions for the transfer
-/// @param nonce The (unordered) nonce used to prevent replay attacks
-/// @param deadline The timestamp after which the permit is no longer valid
+/// The signed permit message for a single token transfer.
+///
+/// Do not need to pass in spender address as it is required that it is msg.sender.
+///
+/// A user still signs over a spender address (spender is located between `permitted` &
+/// `nonce`).
+///
+/// Parameters:
+///
+/// - 'permitted': The token permissions for the transfer.
+/// - 'nonce': The (unordered) nonce used to prevent replay attacks.
+/// - 'deadline': The timestamp after which the permit is no longer valid.
 #[derive(Drop, Copy, Hash, Serde)]
 pub struct PermitTransferFrom {
     pub permitted: TokenPermissions,
@@ -113,11 +121,15 @@ pub struct PermitTransferFrom {
     pub deadline: u256,
 }
 
-/// The signed permit message for a batch token transfer
-/// @dev The same `spender` rules apply as for `PermitTransferFrom`
-/// @param permitted The token permissions for each transfer
-/// @param nonce The (unordered) nonce used to prevent replay attacks
-/// @param deadline The timestamp after which the permit is no longer valid
+/// The signed permit message for a batch token transfer.
+///
+/// The same `spender` rules apply as for `PermitTransferFrom`.
+///
+/// Parameters:
+///
+/// - 'permitted': The token permissions for each transfer.
+/// - 'nonce': The (unordered) nonce used to prevent replay attacks.
+/// - 'deadline': The timestamp after which the permit is no longer valid.
 #[derive(Drop, Copy, Serde)]
 pub struct PermitBatchTransferFrom {
     pub permitted: Span<TokenPermissions>,
@@ -125,9 +137,12 @@ pub struct PermitBatchTransferFrom {
     pub deadline: u256,
 }
 
-/// Specifies the recipient address and amount for each transfer
-/// @param to The recipient address for the transfer
-/// @param requested_amount The amount requested to be transferred by the spender
+/// Specifies the recipient address and amount for each transfer.
+///
+/// Parameters:
+///
+/// - 'to': The recipient address for the transfer.
+/// - 'requested_amount': The amount requested to be transferred by the spender.
 #[derive(Drop, Copy, Hash, Serde)]
 pub struct SignatureTransferDetails {
     pub to: ContractAddress,
