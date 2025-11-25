@@ -163,7 +163,8 @@ pub mod SignatureTransferComponent {
         /// Parameters:
         ///
         /// - 'permit': The permit data signed over by the owner.
-        /// - 'transfer_details': Specifies the recipient and requested amount for each token transfer.
+        /// - 'transfer_details': Specifies the recipient and requested amount for each token
+        /// transfer.
         /// - 'owner': The owner of the tokens to transfer.
         /// - 'data_hash': The hash of the permit data to verify the signature against.
         /// - 'signature': The signature to verify.

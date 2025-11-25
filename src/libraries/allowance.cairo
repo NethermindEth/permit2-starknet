@@ -9,7 +9,8 @@ pub trait AllowanceTrait {
     /// Parameters:
     ///
     /// - 'amount': The new approved amount.
-    /// - 'expiration': The new expiration timestamp. If set to BLOCK_TIMESTAMP_EXPIRATION, uses current block timestamp.
+    /// - 'expiration': The new expiration timestamp. If set to BLOCK_TIMESTAMP_EXPIRATION, uses
+    /// current block timestamp.
     /// - 'nonce': The new nonce value.
     fn update_all(
         ref self: StoragePath<Mutable<Allowance>>, amount: u256, expiration: u64, nonce: u64,
@@ -19,7 +20,8 @@ pub trait AllowanceTrait {
     /// Parameters:
     ///
     /// - 'amount': The new approved amount.
-    /// - 'expiration': The new expiration timestamp. If set to BLOCK_TIMESTAMP_EXPIRATION, uses current block timestamp.
+    /// - 'expiration': The new expiration timestamp. If set to BLOCK_TIMESTAMP_EXPIRATION, uses
+    /// current block timestamp.
     fn update_amount_and_expiration(
         ref self: StoragePath<Mutable<Allowance>>, amount: u256, expiration: u64,
     );

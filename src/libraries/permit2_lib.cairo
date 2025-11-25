@@ -72,7 +72,8 @@ pub trait Permit2Lib {
 
 pub impl Permit2LibImpl of Permit2Lib {
     #[feature("safe_dispatcher")]
-    /// Implementation of transfer_from2 that attempts native ERC20 transfer first, then falls back to Permit2.
+    /// Implementation of transfer_from2 that attempts native ERC20 transfer first, then falls back
+    /// to Permit2.
     ///
     /// Parameters:
     ///
@@ -100,7 +101,8 @@ pub impl Permit2LibImpl of Permit2Lib {
     }
 
     #[feature("safe_dispatcher")]
-    /// Implementation of permit2 that attempts native ERC20Permit permit first, then falls back to Permit2.
+    /// Implementation of permit2 that attempts native ERC20Permit permit first, then falls back to
+    /// Permit2.
     ///
     /// Parameters:
     ///

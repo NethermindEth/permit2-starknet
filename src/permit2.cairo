@@ -73,7 +73,8 @@ pub mod Permit2 {
     pub impl Permit2 of IDomainSeparator<ContractState> {
         /// Returns the domain separator for SNIP-12 signature verification.
         ///
-        /// The domain separator is computed from the contract name, version, chain ID, and revision.
+        /// The domain separator is computed from the contract name, version, chain ID, and
+        /// revision.
         ///
         /// Returns the domain separator as a felt252.
         fn DOMAIN_SEPARATOR(self: @ContractState) -> felt252 {
