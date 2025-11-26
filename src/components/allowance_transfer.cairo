@@ -233,6 +233,14 @@ pub mod AllowanceTransferComponent {
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>, +SNIP12Metadata, +Drop<TContractState>,
     > of InternalTrait<TContractState> {
+        /// Transfers tokens from one address to another using an allowance.
+        ///
+        /// Parameters:
+        ///
+        /// - 'from': The address to transfer from.
+        /// - 'to': The address of the recipient.
+        /// - 'amount': The amount of the token to transfer.
+        /// - 'token': The token address to transfer.
         fn _transfer(
             ref self: ComponentState<TContractState>,
             from: ContractAddress,
@@ -254,6 +262,13 @@ pub mod AllowanceTransferComponent {
         }
 
 
+        /// Updates the approval for a given owner, token, and spender based on permit details.
+        ///
+        /// Parameters:
+        ///
+        /// - 'details': The permit details containing token, amount, expiration, and nonce.
+        /// - 'owner': The owner of the tokens being approved.
+        /// - 'spender': The spender address being approved.
         fn _update_approval(
             ref self: ComponentState<TContractState>,
             details: PermitDetails,

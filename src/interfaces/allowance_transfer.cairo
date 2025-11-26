@@ -118,11 +118,14 @@ pub trait IAllowanceTransfer<TState> {
     );
 }
 
-/// The permit data for a token
-/// @param token The ERC-20 token address
-/// @param amount The maximum amount allowed to spend
-/// @param expiration The timestamp at which a spender's token allowances become invalid
-/// @param nonce An incrementing value indexed per owner, token, and spender for each signature
+/// The permit data for a token.
+///
+/// Parameters:
+///
+/// - 'token': The ERC-20 token address.
+/// - 'amount': The maximum amount allowed to spend.
+/// - 'expiration': The timestamp at which a spender's token allowances become invalid.
+/// - 'nonce': An incrementing value indexed per owner, token, and spender for each signature.
 #[derive(Drop, Copy, Serde, Hash)]
 pub struct PermitDetails {
     pub token: ContractAddress,
@@ -131,10 +134,13 @@ pub struct PermitDetails {
     pub nonce: u64,
 }
 
-/// The permit message signed for a single token allowance
-/// @param details The permit data for a single token allowance
-/// @param spender The address permissioned on the allowed token
-/// @param sig_deadline The deadline on the permit signature
+/// The permit message signed for a single token allowance.
+///
+/// Parameters:
+///
+/// - 'details': The permit data for a single token allowance.
+/// - 'spender': The address permissioned on the allowed token.
+/// - 'sig_deadline': The deadline on the permit signature.
 #[derive(Drop, Copy, Serde, Hash)]
 pub struct PermitSingle {
     pub details: PermitDetails,
@@ -142,10 +148,13 @@ pub struct PermitSingle {
     pub sig_deadline: u256,
 }
 
-/// The permit message signed for multiple token allowances
-/// @param details The permit data for multiple token allowances
-/// @param spender The address permissioned on the allowed tokens
-/// @param sig_deadline The deadline on the permit signature
+/// The permit message signed for multiple token allowances.
+///
+/// Parameters:
+///
+/// - 'details': The permit data for multiple token allowances.
+/// - 'spender': The address permissioned on the allowed tokens.
+/// - 'sig_deadline': The deadline on the permit signature.
 #[derive(Drop, Copy, Serde)]
 pub struct PermitBatch {
     pub details: Span<PermitDetails>,
@@ -154,8 +163,11 @@ pub struct PermitBatch {
 }
 
 /// A token spender pair.
-/// @param token The token address for which the spender is approved
-/// @param spender The spender address that is approved to spend the token
+///
+/// Parameters:
+///
+/// - 'token': The token address for which the spender is approved.
+/// - 'spender': The spender address that is approved to spend the token.
 #[derive(Copy, Drop, Serde)]
 pub struct TokenSpenderPair {
     pub token: ContractAddress,
@@ -163,10 +175,13 @@ pub struct TokenSpenderPair {
 }
 
 /// Details for a token transfer.
-/// @param from The owner of the token being transferred
-/// @param to The recipient of the token being transferred
-/// @param amount The amount of the token being transferred
-/// @param token The token address being transferred
+///
+/// Parameters:
+///
+/// - 'from': The owner of the token being transferred.
+/// - 'to': The recipient of the token being transferred.
+/// - 'amount': The amount of the token being transferred.
+/// - 'token': The token address being transferred.
 #[derive(Copy, Drop, Serde)]
 pub struct AllowanceTransferDetails {
     pub from: ContractAddress,

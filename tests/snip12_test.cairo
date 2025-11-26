@@ -2,7 +2,7 @@ use core::hash::{HashStateExTrait, HashStateTrait};
 use core::poseidon::PoseidonTrait;
 use openzeppelin_utils::cryptography::snip12::{OffchainMessageHash, SNIP12HashSpanImpl, StructHash};
 use permit2::interfaces::allowance_transfer::{PermitBatch, PermitSingle};
-use permit2::interfaces::permit2::{IPermit2Dispatcher, IPermit2DispatcherTrait};
+use permit2::interfaces::permit2::{IDomainSeparatorDispatcher, IDomainSeparatorDispatcherTrait};
 use permit2::interfaces::signature_transfer::{PermitBatchTransferFrom, PermitTransferFrom};
 use permit2::permit2::Permit2::SNIP12MetadataImpl;
 use permit2::snip12_utils::permits::{
@@ -37,7 +37,7 @@ const REVISION: felt252 = 1;
 
 #[test]
 fn test_domain_separator() {
-    let permit2_ = IPermit2Dispatcher { contract_address: deploy_permit2() };
+    let permit2_ = IDomainSeparatorDispatcher { contract_address: deploy_permit2() };
     let expected = PoseidonTrait::new()
         .update_with(STARKNET_DOMAIN_TYPE_HASH)
         .update_with(NAME)
@@ -51,7 +51,7 @@ fn test_domain_separator() {
 
 #[test]
 fn test_domain_separator_after_fork() {
-    let permit2 = IPermit2Dispatcher { contract_address: deploy_permit2() };
+    let permit2 = IDomainSeparatorDispatcher { contract_address: deploy_permit2() };
     let beginning_separator = permit2.DOMAIN_SEPARATOR();
     let new_chain_id = get_tx_info().unbox().chain_id + 1;
 

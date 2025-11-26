@@ -17,9 +17,32 @@ pub const MAX_BIT_MAP: u256 = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 /// of nonces. It allows for the creation of a new bitmap, setting and unsetting bits
 /// at specific indices, and retrieving the value of a bit at a given index.
 pub trait BitmapTrait<T> {
+    /// Creates a new empty bitmap.
+    ///
+    /// Returns a new bitmap with all bits set to 0.
     fn new() -> T;
+    /// Gets the value of a bit at the given index.
+    ///
+    /// Parameters:
+    ///
+    /// - 'bitmap': The bitmap to query.
+    /// - 'index': The index of the bit to get (must be less than 251).
+    ///
+    /// Returns true if the bit is set, false otherwise.
     fn get(bitmap: T, index: u8) -> bool;
+    /// Sets a bit at the given index to 1.
+    ///
+    /// Parameters:
+    ///
+    /// - 'bitmap': The bitmap to modify.
+    /// - 'index': The index of the bit to set (must be less than 251).
     fn set(ref bitmap: T, index: u8);
+    /// Unsets a bit at the given index to 0.
+    ///
+    /// Parameters:
+    ///
+    /// - 'bitmap': The bitmap to modify.
+    /// - 'index': The index of the bit to unset (must be less than 251).
     fn unset(ref bitmap: T, index: u8);
 }
 
@@ -87,7 +110,22 @@ mod felt_bitmap_test {
 ///
 /// Valid indices are: [0, 251), i.e [0,1,2,...,250]
 pub trait BitmapPackingTrait<T> {
+    /// Unpacks a nonce into its nonce space and bit position.
+    ///
+    /// Parameters:
+    ///
+    /// - 'nonce': The packed nonce to unpack.
+    ///
+    /// Returns a tuple containing the nonce space and the bit position.
     fn unpack_nonce(nonce: T) -> (T, u8);
+    /// Packs a nonce space and bit position into a single nonce value.
+    ///
+    /// Parameters:
+    ///
+    /// - 'nonce_space': The nonce space (must be <= MAX_NONCE_SPACE).
+    /// - 'index': The bit position (must be less than 251).
+    ///
+    /// Returns the packed nonce value.
     fn pack_nonce(nonce_space: T, index: u8) -> T;
 }
 

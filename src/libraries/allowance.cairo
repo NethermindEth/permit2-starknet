@@ -4,18 +4,35 @@ use starknet::storage_access::StorePacking;
 pub trait AllowanceTrait {
     const BLOCK_TIMESTAMP_EXPIRATION: u64;
 
+    /// Updates all fields of an allowance: amount, expiration, and nonce.
+    ///
+    /// Parameters:
+    ///
+    /// - 'amount': The new approved amount.
+    /// - 'expiration': The new expiration timestamp. If set to BLOCK_TIMESTAMP_EXPIRATION, uses
+    /// current block timestamp.
+    /// - 'nonce': The new nonce value.
     fn update_all(
         ref self: StoragePath<Mutable<Allowance>>, amount: u256, expiration: u64, nonce: u64,
     );
+    /// Updates the amount and expiration of an allowance, leaving the nonce unchanged.
+    ///
+    /// Parameters:
+    ///
+    /// - 'amount': The new approved amount.
+    /// - 'expiration': The new expiration timestamp. If set to BLOCK_TIMESTAMP_EXPIRATION, uses
+    /// current block timestamp.
     fn update_amount_and_expiration(
         ref self: StoragePath<Mutable<Allowance>>, amount: u256, expiration: u64,
     );
 }
 
-/// The saved permissions
-/// @dev This info is saved per owner, per token, per spender and all signed over in the permit
-/// message
-/// @dev Setting amount to type(uint256).max sets an unlimited approval
+/// The saved permissions.
+///
+/// This info is saved per owner, per token, per spender and all signed over in the permit
+/// message.
+///
+/// Setting amount to type(uint256).max sets an unlimited approval.
 #[derive(Drop, Copy, Serde, PartialEq, Debug)]
 pub struct Allowance {
     pub amount: u256,
